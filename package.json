@@ -1,0 +1,30 @@
+{
+  "name": "coap-packet",
+  "version": "0.1.0",
+  "description": "Generate and Parse CoAP packets",
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha --bail --reporter spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mcollina/coap-packets.git"
+  },
+  "pre-commit": [
+    "test"
+  ],
+  "keywords": [
+    "coap",
+    "m2m",
+    "iot",
+    "udp",
+    "packet"
+  ],
+  "author": "Matteo Collina <hello@matteocollina.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "pre-commit": "0.0.3",
+    "chai": "~1.8.0",
+    "mocha": "~1.13.0"
+  }
+}
