@@ -1,7 +1,9 @@
 
-// a global index for parsing the options and the payload
-// we can do this as the parsing is a sync operation
-var index
+var empty = new Buffer(0)
+
+  // a global index for parsing the options and the payload
+  // we can do this as the parsing is a sync operation
+  , index
 
   // last five bits are 1
   // 31.toString(2) => '111111'
@@ -9,8 +11,6 @@ var index
 
   , nextMsgId = 0
   
-  , empty = new Buffer(0)
-
   , codes
 
 codes = {
@@ -29,59 +29,43 @@ module.exports.generate = function generate(packet) {
   var buffer
     , byte
     , pos = 0
+    , options
+    , i
 
-  if (!packet)
-    packet = {}
+  packet = fillGenDefaults(packet)
+  options = prepareOptions(packet)
 
-  if (!packet.payload)
-    packet.payload = empty
+  buffer = new Buffer(calculateLength(packet, options))
 
-  if (!packet.token)
-    packet.token = empty
-
-  if (packet.token.length > 8)
-    throw new Error('Token too long')
-
-  if (!packet.code)
-    packet.code = 'GET'
-
-  if (!packet.messageId)
-    packet.messageId = nextMsgId++
-
-  if (nextMsgId === 65535)
-    nextMsgId = 0
-
-  buffer = new Buffer(5 + packet.payload.length + packet.token.length)
-
+  // first byte
   byte = 0
   byte |= 1 << 6 // first two bits are version
-
-  if (packet.confirmable)
-    byte |= 0 << 4
-  else if (packet.ack)
-    byte |= 2 << 4
-  else if (packet.reset)
-    byte |= 3 << 4
-  else
-    byte |= 1 << 4 // the message is non-confirmable
-
+  byte |= confirmableAckResetMask(packet)
   byte |= packet.token.length
-
   buffer.writeUInt8(byte, pos++)
 
+  // code can be humized or not
   if (codes[packet.code])
     buffer.writeUInt8(codes[packet.code], pos++)
   else
     buffer.writeUInt8(toCode(packet.code), pos++)
 
+  // two bytes for the message id
   buffer.writeUInt16BE(packet.messageId, pos)
   pos += 2
 
+  // the token might be an empty buffer
   packet.token.copy(buffer, pos)
   pos += packet.token.length
 
-  buffer.writeUInt8(255, pos++)
+  // write the options
+  for (i = 0; i < options.length; i++) {
+    options[i].copy(buffer, pos)
+    pos += options[i].length
+  }
 
+  // payload separator
+  buffer.writeUInt8(255, pos++)
   packet.payload.copy(buffer, pos)
 
   return buffer
@@ -249,4 +233,161 @@ function toCode(code) {
   byte |= parseInt(split[1])
 
   return byte
+}
+
+function fillGenDefaults(packet) {
+
+  if (!packet)
+    packet = {}
+
+  if (!packet.payload)
+    packet.payload = empty
+
+  if (!packet.token)
+    packet.token = empty
+
+  if (packet.token.length > 8)
+    throw new Error('Token too long')
+
+  if (!packet.code)
+    packet.code = 'GET'
+
+  if (!packet.messageId)
+    packet.messageId = nextMsgId++
+
+  if (!packet.options)
+    packet.options = {}
+
+  if (nextMsgId === 65535)
+    nextMsgId = 0
+
+  return packet
+}
+
+function confirmableAckResetMask(packet) {
+  var result
+
+  if (packet.confirmable)
+    rexult = 0 << 4
+  else if (packet.ack)
+    result = 2 << 4
+  else if (packet.reset)
+    result = 3 << 4
+  else
+    result = 1 << 4 // the message is non-confirmable
+
+  return result
+}
+
+function calculateLength(packet, options) {
+  var length = 5 + packet.payload.length + packet.token.length
+    , i
+
+  for (i = 0; i < options.length; i++) {
+    length += options[i].length
+  }
+
+  return length
+}
+
+var optionStringToNumber = (function genOptionParser() {
+
+  var code = Object.keys(numMap).reduce(function(acc, key) {
+
+    acc += 'case \'' + numMap[key] + '\':\n'
+    acc += '  return \'' + key +'\'\n'
+
+    return acc
+  }, 'switch(string) {\n')
+
+  code += 'default:\n'
+  code += 'return parseInt(string)'
+  code += '}\n'
+
+  return new Function('string', code)
+})()
+
+var nameMap = Object.keys(numMap).reduce(function(acc, key) {
+  acc[numMap[key]] = key
+  return acc
+}, {})
+
+function optionSorter(a, b) {
+  a = nameMap[a] || parseInt(a)
+  b = nameMap[b] || parseInt(b)
+
+  if (a > b)
+    return 1
+  else if (b < a)
+    return -1
+  else
+    return 0
+}
+
+function prepareOptions(packet) {
+  var options = []
+    , optionsKeys = Object.keys(packet.options)
+    , total = 0
+    , delta
+    , buffer
+    , byte
+    , option
+    , i
+    , bufferSize
+    , pos
+    , value
+
+  optionsKeys.sort(optionSorter)
+
+  for (i = 0; i < optionsKeys.length; i++) {
+    pos = 0
+    option = optionsKeys[i]
+    delta = optionStringToNumber(option) - total
+    value = packet.options[option]
+
+    // max option length is 1 header, 2 ext numb, 2 ext length
+    buffer = new Buffer(value.length + 5)
+
+    byte = 0
+
+
+    if (delta <= 12) {
+      byte |= delta << 4
+    } else if (delta > 12 && delta < 269) {
+      byte |= 13 << 4
+    } else {
+      byte |= 14 << 4
+    }
+
+    if (value.length <= 12) {
+      byte |= value.length
+    } else if (value.length > 12 && value.length < 269) {
+      byte |= 13
+    } else {
+      byte |= 14
+    }
+
+    buffer.writeUInt8(byte, pos++)
+
+    if (delta > 12 && delta < 269) {
+      buffer.writeUInt8(delta - 13, pos++)
+    } else if (delta >= 269) {
+      buffer.writeUInt16BE(delta - 269, pos)
+      pos += 2
+    }
+
+    if (value.length > 12 && value.length < 269) {
+      buffer.writeUInt8(value.length - 13, pos++)
+    } else if (value.length >= 269) {
+      buffer.writeUInt16BE(value.length - 269, pos)
+      pos += 2
+    }
+
+    value.copy(buffer, pos)
+    pos += value.length
+    total += delta
+    options.push(buffer.slice(0, pos))
+  }
+
+  return options
 }

@@ -726,5 +726,185 @@ describe('packet.generate', function() {
         expect(byte).to.equal(codes[key])
       })
     })
+
+    var shortOptions = {
+        'If-Match': 1
+      , 'Uri-Host': 3
+      , ETag: 4
+      , 'If-None-Match': 5
+      , 'Uri-Port': 7
+      , 'Location-Path': 8
+      , 'Uri-Path': 11
+      , 'Content-Format': 12
+
+      // this is not specified by the protocol, 
+      // but it's needed to check if it can parse
+      // numbers
+      , '9': 9
+    }
+
+    Object.keys(shortOptions).forEach(function(option) {
+      it('should generate ' + option + ' option with unextended length', function() {
+        packet = {
+          options: {}
+        }
+
+        packet.options[option] = new Buffer(5)
+        buffer = generate(packet)
+
+        expect((buffer.readUInt8(4) & parseInt('11110000', 2)) >> 4).to.eql(shortOptions[option])
+        expect((buffer.readUInt8(4) & parseInt('00001111', 2))).to.eql(packet.options[option].length)
+        expect(buffer.slice(5, 10)).to.eql(packet.options[option])
+      })
+
+      it('should generate ' + option + ' option with one-byte extended length', function() {
+        packet = {
+          options: {}
+        }
+
+        packet.options[option] = new Buffer(20)
+        buffer = generate(packet)
+
+        expect((buffer.readUInt8(4) & parseInt('11110000', 2)) >> 4).to.eql(shortOptions[option])
+        expect((buffer.readUInt8(4) & parseInt('00001111', 2))).to.eql(13)
+        expect(buffer.readUInt8(5)).to.eql(packet.options[option].length - 13)
+        expect(buffer.slice(6, 26)).to.eql(packet.options[option])
+      })
+
+      it('should generate ' + option + ' option with two-byte extended length', function() {
+        packet = {
+          options: {}
+        }
+
+        packet.options[option] = new Buffer(300)
+        buffer = generate(packet)
+
+        expect((buffer.readUInt8(4) & parseInt('11110000', 2)) >> 4).to.eql(shortOptions[option])
+        expect((buffer.readUInt8(4) & parseInt('00001111', 2))).to.eql(14)
+        expect(buffer.readUInt16BE(5)).to.eql(packet.options[option].length - 269)
+        expect(buffer.slice(7, 307)).to.eql(packet.options[option])
+      })
+
+      if (shortOptions[option] !== 1) {
+        it('should generate ' + option + ' option following another option', function() {
+          packet = {
+            options: {}
+          }
+
+          packet.options['If-Match'] = new Buffer(5)
+          packet.options[option] = new Buffer(5)
+          buffer = generate(packet)
+
+          expect((buffer.readUInt8(10) & parseInt('11110000', 2)) >> 4).to.eql(shortOptions[option] - 1)
+          expect((buffer.readUInt8(10) & parseInt('00001111', 2))).to.eql(packet.options[option].length)
+          expect(buffer.slice(11, 16)).to.eql(packet.options[option])
+        })
+      }
+    })
+
+    var longOptions = {
+        'Max-Age': 14
+      , 'Uri-Query': 15
+      , '16': 16 //unknown, just to be sure it parses
+      , 'Accept': 17
+      , 'Location-Query': 20
+      , 'Proxy-Uri': 35
+      , 'Proxy-Scheme': 39
+      , 'Size1': 60
+    }
+
+    Object.keys(longOptions).forEach(function(option) {
+      it('should generate ' + option + ' option with unextended length', function() {
+        packet = {
+          options: {}
+        }
+
+        packet.options[option] = new Buffer(5)
+        buffer = generate(packet)
+
+        expect((buffer.readUInt8(4) & parseInt('11110000', 2)) >> 4).to.eql(13)
+        expect((buffer.readUInt8(4) & parseInt('00001111', 2))).to.eql(packet.options[option].length)
+        expect(buffer.readUInt8(5)).to.eql(longOptions[option] - 13)
+        expect(buffer.slice(6, 11)).to.eql(packet.options[option])
+      })
+
+      it('should generate ' + option + ' option with one-byte extended length', function() {
+        packet = {
+          options: {}
+        }
+
+        packet.options[option] = new Buffer(20)
+        buffer = generate(packet)
+
+        expect((buffer.readUInt8(4) & parseInt('11110000', 2)) >> 4).to.eql(13)
+        expect((buffer.readUInt8(4) & parseInt('00001111', 2))).to.eql(13)
+        expect(buffer.readUInt8(5)).to.eql(longOptions[option] - 13)
+        expect(buffer.readUInt8(6)).to.eql(packet.options[option].length - 13)
+        expect(buffer.slice(7, 27)).to.eql(packet.options[option])
+      })
+
+      it('should generate ' + option + ' option with two-byte extended length', function() {
+        packet = {
+          options: {}
+        }
+
+        packet.options[option] = new Buffer(300)
+        buffer = generate(packet)
+
+        expect((buffer.readUInt8(4) & parseInt('11110000', 2)) >> 4).to.eql(13)
+        expect((buffer.readUInt8(4) & parseInt('00001111', 2))).to.eql(14)
+        expect(buffer.readUInt8(5)).to.eql(longOptions[option] - 13)
+        expect(buffer.readUInt16BE(6)).to.eql(packet.options[option].length - 269)
+        expect(buffer.slice(8, 308)).to.eql(packet.options[option])
+      })
+    })
+
+    ;['560', '720'].forEach(function(option) {
+      var optionNum = '' + option
+
+      it('should generate ' + option + ' option with unextended length', function() {
+        packet = {
+          options: {}
+        }
+
+        packet.options[option] = new Buffer(5)
+        buffer = generate(packet)
+
+        expect((buffer.readUInt8(4) & parseInt('11110000', 2)) >> 4).to.eql(14)
+        expect((buffer.readUInt8(4) & parseInt('00001111', 2))).to.eql(packet.options[option].length)
+        expect(buffer.readUInt16BE(5)).to.eql(optionNum - 269)
+        expect(buffer.slice(7, 12)).to.eql(packet.options[option])
+      })
+
+      it('should generate ' + option + ' option with one-byte extended length', function() {
+        packet = {
+          options: {}
+        }
+
+        packet.options[option] = new Buffer(20)
+        buffer = generate(packet)
+
+        expect((buffer.readUInt8(4) & parseInt('11110000', 2)) >> 4).to.eql(14)
+        expect((buffer.readUInt8(4) & parseInt('00001111', 2))).to.eql(13)
+        expect(buffer.readUInt16BE(5)).to.eql(optionNum - 269)
+        expect(buffer.readUInt8(7)).to.eql(packet.options[option].length - 13)
+        expect(buffer.slice(8, 28)).to.eql(packet.options[option])
+      })
+
+      it('should generate ' + option + ' option with two-byte extended length', function() {
+        packet = {
+          options: {}
+        }
+
+        packet.options[option] = new Buffer(300)
+        buffer = generate(packet)
+
+        expect((buffer.readUInt8(4) & parseInt('11110000', 2)) >> 4).to.eql(14)
+        expect((buffer.readUInt8(4) & parseInt('00001111', 2))).to.eql(14)
+        expect(buffer.readUInt16BE(5)).to.eql(optionNum - 269)
+        expect(buffer.readUInt16BE(7)).to.eql(packet.options[option].length - 269)
+        expect(buffer.slice(9, 309)).to.eql(packet.options[option])
+      })
+    })
   })
 })
