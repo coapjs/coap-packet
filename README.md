@@ -83,7 +83,7 @@ The JS representation of a CoAP packet is:
 Instead of numerical codes, it also supports humanized names, e.g.
 `GET`, `POST`, `PUT`, `DELETE`.
 
-### Contributors
+## Contributors
 
 Coap-Packet is only possible due to the excellent work of the following contributors:
 
