@@ -7,6 +7,14 @@ Status](https://travis-ci.org/mcollina/coap-packet.png)](https://travis-ci.org/m
 __CoAP-Packet__ is an _highly experimental_ generator and parser of CoAP
 packets.
 
+What is CoAP?
+> Constrained Application Protocol (CoAP) is a software protocol
+intended to be used in very simple electronics devices that allows them
+to communicate interactively over the Internet. -  Wikipedia
+
+This library follows the
+[draft-18](http://tools.ietf.org/html/draft-ietf-core-coap-18) of the standard.
+
 It does not provide any CoAP semantics, it just parses the protocol.
 
 This has been tested only on node v0.8.
