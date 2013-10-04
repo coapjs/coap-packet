@@ -966,6 +966,7 @@ describe('parse and generate', function() {
         token: new Buffer(4)
       , code: '0.01'
       , messageId: 42
+      , payload: new Buffer(400)
       , options: [{
             name: 'If-Match'
           , value: new Buffer(5)

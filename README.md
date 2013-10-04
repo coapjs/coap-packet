@@ -78,6 +78,7 @@ The JS representation of a CoAP packet is:
     token: new Buffer(4)
   , code: '0.01'
   , messageId: 42
+  , payload: new Buffer(200)
   , options: [{
         name: 'If-Match'
       , value: new Buffer(5)
