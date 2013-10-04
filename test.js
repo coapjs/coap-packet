@@ -585,3 +585,146 @@ describe('packet.parse', function() {
     })
   })
 })
+
+describe('packet.generate', function() {
+  var packet, buffer, byte
+
+  describe('with no parameters', function() {
+
+    beforeEach(function() {
+      buffer = generate()
+    })
+
+    it('should have version 1', function() {
+      byte = buffer.readUInt8(0) & parseInt('11000000', 2)
+      expect(byte >> 6).to.equal(1)
+    })
+
+    it('should be non confirmable', function() {
+      byte = buffer.readUInt8(0) & parseInt('00110000', 2)
+      expect(byte >> 4).to.equal(1)
+    })
+
+    it('should have no token length', function() {
+      byte = buffer.readUInt8(0) & parseInt('00001111', 2)
+      expect(byte).to.equal(0)
+    })
+
+    it('should have a message id', function() {
+      byte = buffer.readUInt8(0) & parseInt('00001111', 2)
+      expect(byte).to.equal(0)
+    })
+
+    it('should be a GET', function() {
+      byte = buffer.readUInt8(1)
+      expect(byte).to.equal(1)
+    })
+
+    it('should have a message id', function() {
+      expect(buffer.readUInt16BE(2)).not.to.equal(0)
+    })
+
+    it('should have a different message id than the previous packet', function() {
+      var msgId1  = buffer.readUInt16BE(2)
+        , buffer2 = generate()
+        , msgId2  = buffer2.readUInt16BE(2)
+
+      expect(msgId1).not.to.eql(msgId2)
+    })
+
+    it('should have the payload separator', function() {
+      expect(buffer.readUInt8(4)).to.equal(255)
+    })
+  })
+
+  describe('with parameters', function() {
+    var payload
+      , token
+
+    it('should generate a non-confirmable message', function() {
+      buffer = generate({ confirmable: false })
+      byte = buffer.readUInt8(0) & parseInt('00110000', 2)
+      expect(byte >> 4).to.equal(1)
+    })
+
+    it('should generate a confirmable message', function() {
+      buffer = generate({ confirmable: true })
+      byte = buffer.readUInt8(0) & parseInt('00110000', 2)
+      expect(byte >> 4).to.equal(0)
+    })
+
+    it('should generate an ack message', function() {
+      buffer = generate({ ack: true })
+      byte = buffer.readUInt8(0) & parseInt('00110000', 2)
+      expect(byte >> 4).to.equal(2)
+    })
+
+    it('should generate a reset message', function() {
+      buffer = generate({ reset: true })
+      byte = buffer.readUInt8(0) & parseInt('00110000', 2)
+      expect(byte >> 4).to.equal(3)
+    })
+
+    it('should generate a payload', function() {
+      payload = new Buffer(42)
+      buffer = generate({ payload: payload })
+      expect(buffer.slice(5)).to.eql(payload)
+    })
+
+    it('should generate a payload', function() {
+      payload = new Buffer(42)
+      buffer = generate({ payload: payload })
+      expect(buffer.slice(5)).to.eql(payload)
+    })
+
+    it('should use a given messageId', function() {
+      buffer = generate({ messageId: 42 })
+      expect(buffer.readUInt16BE(2)).to.equal(42)
+    })
+
+    it('should generate a token', function() {
+      token = new Buffer(3)
+      buffer = generate({ token: token })
+      expect(buffer.slice(4, 7)).to.eql(token)
+    })
+
+    it('should generate the token length', function() {
+      token = new Buffer(3)
+      buffer = generate({ token: token })
+      byte = buffer.readUInt8(0) & parseInt('00001111', 2)
+      expect(byte).to.equal(3)
+    })
+
+    it('should have a maximum token length of 8', function() {
+      token = new Buffer(9)
+      expect(generate.bind(null, { token: token })).to.throw('Token too long')
+    })
+
+    it('should send a given code', function() {
+      buffer = generate({ code: '0.02' })
+      byte = buffer.readUInt8(1)
+      expect(byte).to.equal(2)
+    })
+
+    var codes = {
+        'GET': 1
+      , 'POST': 2
+      , 'PUT': 3
+      , 'DELETE': 4
+    }
+
+    Object.keys(codes).forEach(function(key) {
+      it('should send ' + key + ' passing the code in human format', function() {
+        buffer = generate({ code: key })
+        byte = buffer.readUInt8(1)
+        expect(byte).to.equal(codes[key])
+      })
+
+      it('should send ' + key + ' passing the code in human format (lowercase)', function() {
+        buffer = generate({ code: key.toLowerCase() })
+        byte = buffer.readUInt8(1)
+        expect(byte).to.equal(codes[key])
+      })
+    })
+  })
+})

@@ -7,13 +7,87 @@ var index
   // 31.toString(2) => '111111'
   , lowerCodeMask = 31
 
+  , nextMsgId = 0
+  
+  , empty = new Buffer(0)
 
-module.exports.generate = function(packet) {
+  , codes
 
-  return new Buffer(0)
+codes = {
+    'GET': 1
+  , 'POST': 2
+  , 'PUT': 3
+  , 'DELETE': 4
+  , 'get': 1
+  , 'post': 2
+  , 'put': 3
+  , 'delete': 4
 }
 
-module.exports.parse = function(buffer) {
+module.exports.generate = function generate(packet) {
+
+  var buffer
+    , byte
+    , pos = 0
+
+  if (!packet)
+    packet = {}
+
+  if (!packet.payload)
+    packet.payload = empty
+
+  if (!packet.token)
+    packet.token = empty
+
+  if (packet.token.length > 8)
+    throw new Error('Token too long')
+
+  if (!packet.code)
+    packet.code = 'GET'
+
+  if (!packet.messageId)
+    packet.messageId = nextMsgId++
+
+  if (nextMsgId === 65535)
+    nextMsgId = 0
+
+  buffer = new Buffer(5 + packet.payload.length + packet.token.length)
+
+  byte = 0
+  byte |= 1 << 6 // first two bits are version
+
+  if (packet.confirmable)
+    byte |= 0 << 4
+  else if (packet.ack)
+    byte |= 2 << 4
+  else if (packet.reset)
+    byte |= 3 << 4
+  else
+    byte |= 1 << 4 // the message is non-confirmable
+
+  byte |= packet.token.length
+
+  buffer.writeUInt8(byte, pos++)
+
+  if (codes[packet.code])
+    buffer.writeUInt8(codes[packet.code], pos++)
+  else
+    buffer.writeUInt8(toCode(packet.code), pos++)
+
+  buffer.writeUInt16BE(packet.messageId, pos)
+  pos += 2
+
+  packet.token.copy(buffer, pos)
+  pos += packet.token.length
+
+  buffer.writeUInt8(255, pos++)
+
+  packet.payload.copy(buffer, pos)
+
+  return buffer
+}
+
+module.exports.parse = function parse(buffer) {
   index = 4
 
   return {
@@ -165,4 +239,14 @@ function parseOptions(buffer) {
   }
 
   return options
+}
+
+function toCode(code) {
+  var split = code.split('.')
+    , byte  = 0
+  
+  byte |= parseInt(split[0]) << 5
+  byte |= parseInt(split[1])
+
+  return byte
 }
