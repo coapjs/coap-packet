@@ -960,4 +960,22 @@ describe('parse and generate', function() {
     // orig will be filled with the defaults by generate
     expect(parse(generate(orig))).to.eql(orig)
   })
+
+  it('should process a packet with all stuff', function() {
+    orig = {
+        token: new Buffer(4)
+      , code: '0.01'
+      , messageId: 42
+      , options: [{
+            name: 'If-Match'
+          , value: new Buffer(5)
+        }, {
+            name: 'Uri-Path' 
+          , value: new Buffer('hello')
+        }]
+    }
+
+    // orig will be filled with the defaults by generate
+    expect(parse(generate(orig))).to.eql(orig)
+  })
 })
