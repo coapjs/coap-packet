@@ -32,11 +32,6 @@ describe('packet.parse', function() {
       buildPacket(new Buffer(0))
     })
 
-    it('should parse the version number', function() {
-      packet = parse(buffer)
-      expect(packet).to.have.property('version', 1)
-    })
-
     it('should throw if it reads version two', function() {
       buffer.writeUInt8(2 << 6, 0)
       expect(parse.bind(null, buffer)).to.throw('Unsupported version')
@@ -906,5 +901,32 @@ describe('packet.generate', function() {
         expect(buffer.slice(9, 309)).to.eql(packet.options[option])
       })
     })
+  })
+})
+
+describe('parse and generate', function() {
+  var orig, payload
+
+  it('should process an empty packet', function() {
+    orig = {}
+    // orig will be filled with the defaults by generate
+    expect(parse(generate(orig))).to.eql(orig)
+  })
+
+  it('should process a payload', function() {
+    orig = { payload: new Buffer(5) }
+    // orig will be filled with the defaults by generate
+    expect(parse(generate(orig))).to.eql(orig)
+  })
+
+  it('should process a short option', function() {
+    orig = {
+      options: {
+        'If-Match': new Buffer(5)
+      }
+    }
+
+    // orig will be filled with the defaults by generate
+    expect(parse(generate(orig))).to.eql(orig)
   })
 })

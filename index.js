@@ -73,10 +73,10 @@ module.exports.generate = function generate(packet) {
 
 module.exports.parse = function parse(buffer) {
   index = 4
+  parseVersion(buffer)
 
   return {
-      version: parseVersion(buffer)
-    , code: parseCode(buffer)
+      code: parseCode(buffer)
     , confirmable: parseConfirmable(buffer)
     , reset: parseReset(buffer)
     , ack: parseAck(buffer)
@@ -250,7 +250,7 @@ function fillGenDefaults(packet) {
     throw new Error('Token too long')
 
   if (!packet.code)
-    packet.code = 'GET'
+    packet.code = '0.01'
 
   if (!packet.messageId)
     packet.messageId = nextMsgId++
@@ -260,6 +260,15 @@ function fillGenDefaults(packet) {
 
   if (nextMsgId === 65535)
     nextMsgId = 0
+
+  if (!packet.confirmable)
+    packet.confirmable = false
+
+  if (!packet.reset)
+    packet.reset = false
+
+  if (!packet.ack)
+    packet.ack = false
 
   return packet
 }
