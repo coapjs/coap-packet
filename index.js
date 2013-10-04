@@ -181,7 +181,8 @@ function parseOptions(buffer) {
     , delta
     , length
     , nextOption = true
-    , options = {}
+    , options = []
+    , option
 
   while (true) {
     byte = buffer.readUInt8(index)
@@ -217,7 +218,10 @@ function parseOptions(buffer) {
 
     number += delta
 
-    options[optionNumberToString(number)] = buffer.slice(index, index + length)
+    options.push({
+        name: optionNumberToString(number)
+      , value: buffer.slice(index, index + length)
+    })
 
     index += length
   }
@@ -256,7 +260,7 @@ function fillGenDefaults(packet) {
     packet.messageId = nextMsgId++
 
   if (!packet.options)
-    packet.options = {}
+    packet.options = []
 
   if (nextMsgId === 65535)
     nextMsgId = 0
@@ -322,6 +326,9 @@ var nameMap = Object.keys(numMap).reduce(function(acc, key) {
 }, {})
 
 function optionSorter(a, b) {
+  a = a.name
+  b = b.name
+
   a = nameMap[a] || parseInt(a)
   b = nameMap[b] || parseInt(b)
 
@@ -335,7 +342,6 @@ function optionSorter(a, b) {
 
 function prepareOptions(packet) {
   var options = []
-    , optionsKeys = Object.keys(packet.options)
     , total = 0
     , delta
     , buffer
@@ -346,13 +352,13 @@ function prepareOptions(packet) {
     , pos
     , value
 
-  optionsKeys.sort(optionSorter)
+  packet.options.sort(optionSorter)
 
-  for (i = 0; i < optionsKeys.length; i++) {
+  for (i = 0; i < packet.options.length; i++) {
     pos = 0
-    option = optionsKeys[i]
+    option = packet.options[i].name
     delta = optionStringToNumber(option) - total
-    value = packet.options[option]
+    value = packet.options[i].value
 
     // max option length is 1 header, 2 ext numb, 2 ext length
     buffer = new Buffer(value.length + 5)
