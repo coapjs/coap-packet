@@ -17,7 +17,7 @@ This library follows the
 
 It does not provide any CoAP semantics, it just parses the protocol.
 
-This has been tested only on node v0.8.
+This has been tested only on node v0.10.
 
 ## Installation
 
