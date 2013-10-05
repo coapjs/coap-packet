@@ -17,6 +17,8 @@ This library follows the
 
 It does not provide any CoAP semantics, it just parses the protocol.
 
+**CoAP-packet** is an **OPEN Open Source Project**, see the <a href="#contributing">Contributing</a> section to find out what this means.
+
 This has been tested only on node v0.10.
 
 ## Installation
@@ -59,17 +61,20 @@ server.on('message', function(data) {
   * <a href="#parse"><code>coapPacket.<b>parse()</b></code></a>
   * <a href="#generate"><code>coapPacket.<b>generate()</b></code></a>
 
+<a name="parse"></a>
 ### parse(buffer)
 
 The `parse` function takes a buffer and returns a JS object that
 follows a particular <a href="#format">format</a>.
 
+<a name="generate"></a>
 ### generate()
 
 The `generate` function takes a JS object that
 follows a particular <a href="#format">format</a> and transform it into
 a CoAP packet.
 
+<a name="format"></a>
 ### JS packet format
 
 The JS representation of a CoAP packet is:
@@ -91,6 +96,15 @@ The JS representation of a CoAP packet is:
 
 Instead of numerical codes, it also supports humanized names, e.g.
 `GET`, `POST`, `PUT`, `DELETE`.
+
+<a name="contributing"></a>
+## Contributing
+
+__CoAP-Packet__ is an **OPEN Open Source Project**. This means that:
+
+> Individuals making significant and valuable contributions are given commit-access to the project to contribute as they see fit. This project is more like an open wiki than a standard guarded open source project.
+
+See the [CONTRIBUTING.md](https://github.com/mcollina/coap-packet/blob/master/CONTRIBUTING.md) file for more details.
 
 ## Contributors
 
