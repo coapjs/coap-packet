@@ -281,7 +281,7 @@ function confirmableAckResetMask(packet) {
   var result
 
   if (packet.confirmable)
-    rexult = 0 << 4
+    result = 0 << 4
   else if (packet.ack)
     result = 2 << 4
   else if (packet.reset)

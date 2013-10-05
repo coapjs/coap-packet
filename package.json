@@ -4,7 +4,7 @@
   "description": "Generate and Parse CoAP packets",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/.bin/mocha --bail --reporter spec"
+    "test": "./node_modules/.bin/mocha --bail --reporter spec --check-leaks"
   },
   "repository": {
     "type": "git",
