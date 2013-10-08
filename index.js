@@ -31,11 +31,16 @@ module.exports.generate = function generate(packet) {
     , pos = 0
     , options
     , i
+    , length
 
   packet = fillGenDefaults(packet)
   options = prepareOptions(packet)
+  length = calculateLength(packet, options)
 
-  buffer = new Buffer(calculateLength(packet, options))
+  if (length > 1280)
+    throw new Error('Max packet size is 1280: current is ' + length)
+
+  buffer = new Buffer(length)
 
   // first byte
   byte = 0

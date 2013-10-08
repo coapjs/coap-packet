@@ -673,10 +673,9 @@ describe('packet.generate', function() {
       expect(buffer.slice(5)).to.eql(payload)
     })
 
-    it('should generate a payload', function() {
-      payload = new Buffer(42)
-      buffer = generate({ payload: payload })
-      expect(buffer.slice(5)).to.eql(payload)
+    it('should error if the resulting message is greater than 1280', function() {
+      payload = new Buffer(1280 - 4) // the basic headers are 4
+      expect(generate.bind(null, { payload: payload })).to.throw('Max packet size is 1280: current is 1281')
     })
 
     it('should use a given messageId', function() {
