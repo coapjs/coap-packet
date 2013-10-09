@@ -978,4 +978,12 @@ describe('parse and generate', function() {
     // orig will be filled with the defaults by generate
     expect(parse(generate(orig))).to.eql(orig)
   })
+
+  it('should send and parse a code sent in HTTP-format', function() {
+    expect(parse(generate({ code: '500' }))).to.have.property('code', '5.00')
+  })
+
+  it('should send and parse a code sent in numeric HTTP-format', function() {
+    expect(parse(generate({ code: 500 }))).to.have.property('code', '5.00')
+  })
 })

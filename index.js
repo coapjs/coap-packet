@@ -235,13 +235,22 @@ function parseOptions(buffer) {
 }
 
 function toCode(code) {
-  var split = code.split('.')
-    , byte  = 0
-  
-  byte |= parseInt(split[0]) << 5
-  byte |= parseInt(split[1])
+  var split = code.split && code.split('.')
+    , by = 0
 
-  return byte
+  if (split && split.length === 2) {
+    by |= parseInt(split[0]) << 5
+    by |= parseInt(split[1])
+  } else {
+
+    if (!split)
+      code = parseInt(code)
+
+    by |= (code / 100) << 5
+    by |= (code % 100)
+  }
+
+  return by
 }
 
 function fillGenDefaults(packet) {

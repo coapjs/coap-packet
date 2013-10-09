@@ -97,6 +97,9 @@ The JS representation of a CoAP packet is:
 Instead of numerical codes, it also supports humanized names, e.g.
 `GET`, `POST`, `PUT`, `DELETE`.
 
+Numerical codes can also be specified in HTTP format, like `500` or
+`'404'`.
+
 <a name="contributing"></a>
 ## Contributing
 
