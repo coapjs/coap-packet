@@ -1027,4 +1027,8 @@ describe('parse and generate', function() {
   it('should send an ack', function() {
     expect(parse(generate({ ack: true }))).to.have.property('ack', true)
   })
+
+  it('should send an empty message', function() {
+    expect(parse(generate({ code: '0.00', ack: true }))).to.have.property('ack', true)
+  })
 })

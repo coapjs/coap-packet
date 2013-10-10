@@ -69,9 +69,12 @@ module.exports.generate = function generate(packet) {
     pos += options[i].length
   }
 
-  // payload separator
-  buffer.writeUInt8(255, pos++)
-  packet.payload.copy(buffer, pos)
+  if (packet.code !== '0.00') {
+
+    // payload separator
+    buffer.writeUInt8(255, pos++)
+    packet.payload.copy(buffer, pos)
+  }
 
   return buffer
 }
@@ -320,8 +323,11 @@ function confirmableAckResetMask(packet) {
 }
 
 function calculateLength(packet, options) {
-  var length = 5 + packet.payload.length + packet.token.length
+  var length = 4 + packet.payload.length + packet.token.length
     , i
+
+  if (packet.code !== '0.00')
+    length += 1
 
   for (i = 0; i < options.length; i++) {
     length += options[i].length
