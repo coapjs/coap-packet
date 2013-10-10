@@ -80,16 +80,29 @@ module.exports.parse = function parse(buffer) {
   index = 4
   parseVersion(buffer)
 
-  return {
+  var result = {
       code: parseCode(buffer)
     , confirmable: parseConfirmable(buffer)
     , reset: parseReset(buffer)
     , ack: parseAck(buffer)
     , messageId: buffer.readUInt16BE(2)
     , token: parseToken(buffer)
-    , options: parseOptions(buffer)
-    , payload: buffer.slice(index + 1)
+    , options: null
+    , payload: null
   }
+  
+  if (result.code !== '0.00') {
+    result.options = parseOptions(buffer)
+    result.payload = buffer.slice(index + 1)
+  } else {
+    if (buffer.length != 4)
+      throw new Error('Empty messages must be empty')
+
+    result.options = []
+    result.payload = empty
+  }
+
+  return result
 }
 
 function parseVersion(buffer) {

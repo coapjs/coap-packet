@@ -100,6 +100,43 @@ describe('packet.parse', function() {
       expect(packet).to.have.property('ack', false)
     })
 
+    it('should parse an empty message', function() {
+      buffer = new Buffer(4)
+
+      byte = 0
+      byte |= 1 << 6 // byte two bits are version
+      byte |= 1 << 4 // the message is non-confirmable
+      byte |= 0 // the TKL length is zero
+
+      buffer.writeUInt8(byte, 0)
+
+      buffer.writeUInt8(0, 1) // it is an empty message
+
+      buffer.writeUInt16BE(42, 2) // the message ID
+
+      packet = parse(buffer)
+
+      expect(packet.code).to.eql('0.00')
+      expect(packet.payload).to.eql(new Buffer(0))
+    })
+
+    it('should raise an error if an empty message is longer than 5', function() {
+      buffer = new Buffer(5)
+
+      byte = 0
+      byte |= 1 << 6 // byte two bits are version
+      byte |= 1 << 4 // the message is non-confirmable
+      byte |= 0 // the TKL length is zero
+
+      buffer.writeUInt8(byte, 0)
+
+      buffer.writeUInt8(0, 1) // it is an empty message
+
+      buffer.writeUInt16BE(42, 2) // the message ID
+
+      expect(parse.bind(null, buffer)).to.throw('Empty messages must be empty')
+    })
+
     it('should parse confirmable non-reset non-ack', function() {
       byte = 0
       byte |= 1 << 6 // byte two bits are version
@@ -985,5 +1022,9 @@ describe('parse and generate', function() {
 
   it('should send and parse a code sent in numeric HTTP-format', function() {
     expect(parse(generate({ code: 500 }))).to.have.property('code', '5.00')
+  })
+
+  it('should send an ack', function() {
+    expect(parse(generate({ ack: true }))).to.have.property('ack', true)
   })
 })
