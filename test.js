@@ -221,6 +221,10 @@ describe('packet.parse', function() {
       expect(packet.payload).to.eql(payload)
     })
 
+    it('should parse a message with no payload and payload separator', function() {
+      parse(buffer.slice(0, 5))
+    })
+
     var options = {
         'If-Match': 1
       , 'Uri-Host': 3

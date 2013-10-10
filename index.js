@@ -205,7 +205,7 @@ function parseOptions(buffer) {
     , options = []
     , option
 
-  while (true) {
+  while (index < buffer.length) {
     byte = buffer.readUInt8(index)
 
     if (byte === 255 || index > buffer.length) {
