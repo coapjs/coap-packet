@@ -165,6 +165,7 @@ var numMap  = {
   , '3': 'Uri-Host'
   , '4': 'ETag'
   , '5': 'If-None-Match'
+  , '6': 'Observe'
   , '7': 'Uri-Port'
   , '8': 'Location-Path'
   , '11': 'Uri-Path'

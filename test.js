@@ -230,6 +230,7 @@ describe('packet.parse', function() {
       , 'Uri-Host': 3
       , ETag: 4
       , 'If-None-Match': 5
+      , 'Observe': 6
       , 'Uri-Port': 7
       , 'Location-Path': 8
       , 'Uri-Path': 11
@@ -774,6 +775,7 @@ describe('packet.generate', function() {
       , 'Uri-Host': 3
       , ETag: 4
       , 'If-None-Match': 5
+      , 'Observe': 6
       , 'Uri-Port': 7
       , 'Location-Path': 8
       , 'Uri-Path': 11
