@@ -9,7 +9,7 @@ var empty = new Buffer(0)
   // 31.toString(2) => '111111'
   , lowerCodeMask = 31
 
-  , nextMsgId = 0
+  , nextMsgId = Math.floor(Math.random() * 65535)
   
   , codes
 
