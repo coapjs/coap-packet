@@ -1,6 +1,6 @@
 {
   "name": "coap-packet",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Generate and Parse CoAP packets",
   "main": "index.js",
   "scripts": {
