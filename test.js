@@ -1037,4 +1037,26 @@ describe('parse and generate', function() {
   it('should send an empty message', function() {
     expect(parse(generate({ code: '0.00', ack: true }))).to.have.property('ack', true)
   })
+
+  it('should process a packet with Uri-Path and Observe', function() {
+    orig = {
+        token: new Buffer(4)
+      , code: '2.05'
+      , messageId: 42
+      , payload: new Buffer(400)
+      , options: [{
+            name: 'Uri-Path'
+          , value: new Buffer('aaa')
+        }, {
+            name: 'Uri-Path' 
+          , value: new Buffer('bbb')
+        }, {
+            name: 'Observe'
+          , value: new Buffer([42])
+        }]
+    }
+
+    // orig will be filled with the defaults by generate
+    expect(parse(generate(orig))).to.eql(orig)
+  })
 })

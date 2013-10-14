@@ -363,15 +363,15 @@ function optionSorter(a, b) {
   a = a.name
   b = b.name
 
-  a = nameMap[a] || parseInt(a)
-  b = nameMap[b] || parseInt(b)
+  a = parseInt(nameMap[a] || a)
+  b = parseInt(nameMap[b] || b)
 
+  if (a < b)
+    return -1
   if (a > b)
     return 1
-  else if (b < a)
-    return -1
-  else
-    return 0
+
+  return 0
 }
 
 function prepareOptions(packet) {
