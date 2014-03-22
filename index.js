@@ -10,7 +10,7 @@ var empty = new Buffer(0)
   , lowerCodeMask = 31
 
   , nextMsgId = Math.floor(Math.random() * 65535)
-  
+
   , codes
 
 codes = {
@@ -69,7 +69,7 @@ module.exports.generate = function generate(packet) {
     pos += options[i].length
   }
 
-  if (packet.code !== '0.00') {
+  if (packet.code !== '0.00' && packet.payload != '') {
 
     // payload separator
     buffer.writeUInt8(255, pos++)
@@ -93,7 +93,7 @@ module.exports.parse = function parse(buffer) {
     , options: null
     , payload: null
   }
-  
+
   if (result.code !== '0.00') {
     result.options = parseOptions(buffer)
     result.payload = buffer.slice(index + 1)
@@ -327,7 +327,7 @@ function calculateLength(packet, options) {
   var length = 4 + packet.payload.length + packet.token.length
     , i
 
-  if (packet.code !== '0.00')
+  if (packet.code !== '0.00' && packet.payload != '')
     length += 1
 
   for (i = 0; i < options.length; i++) {
