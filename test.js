@@ -654,11 +654,6 @@ describe('packet.generate', function() {
       expect(byte).to.equal(0)
     })
 
-    it('should have a message id', function() {
-      byte = buffer.readUInt8(0) & parseInt('00001111', 2)
-      expect(byte).to.equal(0)
-    })
-
     it('should be a GET', function() {
       byte = buffer.readUInt8(1)
       expect(byte).to.equal(1)
@@ -676,9 +671,9 @@ describe('packet.generate', function() {
       expect(msgId1).not.to.eql(msgId2)
     })
 
-    it('should have the payload separator', function() {
-      expect(buffer.readUInt8(4)).to.equal(255)
-    })
+     it('should not have the payload separator', function() {
+       expect(buffer.length).to.equal(4)
+     })
   })
 
   describe('with parameters', function() {
@@ -707,6 +702,12 @@ describe('packet.generate', function() {
       buffer = generate({ reset: true })
       byte = buffer.readUInt8(0) & parseInt('00110000', 2)
       expect(byte >> 4).to.equal(3)
+    })
+
+    it('should generate a payload marker', function() {
+      payload = new Buffer(42)
+      buffer = generate({ payload: payload })
+      expect(buffer.readUInt8(4)).to.eql(0xFF)
     })
 
     it('should generate a payload', function() {
