@@ -90,6 +90,7 @@ module.exports.parse = function parse(buffer) {
     , ack: parseAck(buffer)
     , messageId: buffer.readUInt16BE(2)
     , token: parseToken(buffer)
+    , block2: null 
     , options: null
     , payload: null
   }
@@ -103,6 +104,35 @@ module.exports.parse = function parse(buffer) {
 
     result.options = []
     result.payload = empty
+  }
+
+  // block2
+  if (result.code !== '0.00') {
+    for (i in result.options) {
+      if (result.options[i].name == 'Block2') {
+        var block2Value = result.options[i].value
+        var num
+        switch (block2Value.length) {
+          case 1:
+          num = block2Value[0] >> 4
+          break
+          case 2:
+          num = (block2Value[0]*256 + block2Value[1]) >> 4
+          break
+          case 3:
+          num = (block2Value[0]*256*256 + block2Value[1]*256 + block2Value[2]) >>4
+          break
+          default:
+          throw new Error('Too long block2 option size: '+block2Value.length)
+        }
+        result.block2 = {
+          moreBlock2: (result.options[i].value.slice(-1)[0] & (0x01<<3))? true:false,
+          num: num,
+          size: Math.pow(2, (result.options[i].value.slice(-1)[0] & 0x07)+4)
+        }
+        break
+      }
+    }
   }
 
   return result
@@ -174,6 +204,8 @@ var numMap  = {
   , '15': 'Uri-Query'
   , '17': 'Accept'
   , '20': 'Location-Query'
+  , '23': 'Block2'
+  , '27': 'Block1'
   , '35': 'Proxy-Uri'
   , '39': 'Proxy-Scheme'
   , '60': 'Size1'
