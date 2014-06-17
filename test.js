@@ -864,6 +864,8 @@ describe('packet.generate', function() {
       , '16': 16 //unknown, just to be sure it parses
       , 'Accept': 17
       , 'Location-Query': 20
+      , 'Block2': 23
+      , 'Block1': 27
       , 'Proxy-Uri': 35
       , 'Proxy-Scheme': 39
       , 'Size1': 60
