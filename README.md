@@ -4,8 +4,7 @@ CoAP-Packet
 [![Build
 Status](https://travis-ci.org/mcollina/coap-packet.png)](https://travis-ci.org/mcollina/coap-packet)
 
-__CoAP-Packet__ is an _highly experimental_ generator and parser of CoAP
-packets.
+__CoAP-Packet__ is a generator and parser of CoAP packets for node.js.
 
 What is CoAP?
 > Constrained Application Protocol (CoAP) is a software protocol
