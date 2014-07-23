@@ -117,8 +117,5 @@ Coap-Packet is only possible due to the excellent work of the following contribu
 </tbody></table>
 
 ## LICENSE
-Copyright (c) 2013-2014 CoAP-Packet contributors (listed above).
 
-Coap-Packet is licensed under an MIT +no-false-attribs license.
-All rights not explicitly granted in the MIT license are reserved.
-See the included LICENSE file for more details.
+MIT, see LICENSE.md file.
