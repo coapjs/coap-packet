@@ -33,7 +33,7 @@ CoAP message between them:
 
 ```
 const dgram       = require('dgram')
-    , coapPacket  = require('coap-packet')
+    , packet      = require('coap-packet')
     , parse       = packet.parse
     , generate    = packet.generate
     , payload     = new Buffer('Hello World')
