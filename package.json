@@ -1,6 +1,6 @@
 {
   "name": "coap-packet",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "description": "Generate and Parse CoAP packets",
   "main": "index.js",
   "scripts": {
@@ -20,6 +20,9 @@
     "udp",
     "packet"
   ],
+  "engines": {
+    "node": ">= 0.10"
+  },
   "author": "Matteo Collina <hello@matteocollina.com>",
   "license": "MIT",
   "devDependencies": {
