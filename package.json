@@ -4,6 +4,7 @@
   "description": "Generate and Parse CoAP packets",
   "main": "index.js",
   "scripts": {
+    "tstest": "tsc -p ./ts",
     "test": "./node_modules/.bin/mocha --bail --reporter spec --check-leaks"
   },
   "repository": {
@@ -26,8 +27,12 @@
   "author": "Matteo Collina <hello@matteocollina.com>",
   "license": "MIT",
   "devDependencies": {
-    "pre-commit": "0.0.3",
+    "@types/node": "7.0.11",
     "chai": "~1.8.0",
-    "mocha": "~1.13.0"
-  }
+    "mocha": "~1.13.0",
+    "pre-commit": "0.0.3",
+    "typescript": "2.2.2"
+  },
+  "types": "index.d.ts",
+  "typings": "index.d.ts"
 }
