@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "tstest": "tsc -p ./ts",
-    "test": "./node_modules/.bin/mocha --bail --reporter spec --check-leaks"
+    "test": "./node_modules/.bin/mocha --bail --reporter spec --check-leaks && npm run tstest"
   },
   "repository": {
     "type": "git",
