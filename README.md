@@ -3,6 +3,7 @@ CoAP-Packet
 
 ![Build Status](https://github.com/mcollina/coap-packet/workflows/Build%20Status/badge.svg)
 [![Coverage Status](https://coveralls.io/repos/github/mcollina/coap-packet/badge.svg?branch=master)](https://coveralls.io/github/mcollina/coap-packet?branch=master)
+[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
 __CoAP-Packet__ is a generator and parser of CoAP packets for node.js.
 
