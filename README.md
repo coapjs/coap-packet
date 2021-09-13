@@ -19,7 +19,7 @@ It does not provide any CoAP semantics, it just parses the protocol.
 
 **CoAP-packet** is an **OPEN Open Source Project**, see the <a href="#contributing">Contributing</a> section to find out what this means.
 
-This has been tested only on node v0.10.
+The library is being tested on Node versions 12, 14, and 16.
 
 ## Installation
 
