@@ -1,5 +1,5 @@
 
-var empty = new Buffer(0)
+var empty = Buffer.alloc(0)
 
   // a global index for parsing the options and the payload
   // we can do this as the parsing is a sync operation
@@ -40,7 +40,7 @@ module.exports.generate = function generate(packet) {
   if (length > 1280)
     throw new Error('Max packet size is 1280: current is ' + length)
 
-  buffer = new Buffer(length)
+  buffer = new Buffer.alloc(length)
 
   // first byte
   byte = 0
@@ -397,7 +397,7 @@ function prepareOptions(packet) {
     value = packet.options[i].value
 
     // max option length is 1 header, 2 ext numb, 2 ext length
-    buffer = new Buffer(value.length + 5)
+    buffer = Buffer.alloc(value.length + 5)
 
     byte = 0
 
