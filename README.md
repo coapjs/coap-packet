@@ -32,23 +32,26 @@ The following example opens an UDP client and UDP server and sends a
 CoAP message between them:
 
 ```js
-const dgram       = require('dgram')
-    , packet      = require('coap-packet')
-    , parse       = packet.parse
-    , generate    = packet.generate
-    , payload     = Buffer.from('Hello World')
-    , message     = generate({ payload: payload })
-    , port        = 41234
-    , client      = dgram.createSocket("udp4")
-    , server      = dgram.createSocket("udp4")
+const dgram = require('dgram')
+const packet = require('coap-packet')
+const parse = packet.parse
+const generate = packet.generate
+const payload = Buffer.from('Hello World')
+const message = generate({ payload: payload })
+const port = 41234
+const client = dgram.createSocket('udp4')
+const server = dgram.createSocket('udp4')
 
-server.bind(port, function() {
-  client.send(message, 0, message.length, 41234, "localhost", function(err, bytes) {
+server.bind(port, function () {
+  client.send(message, 0, message.length, 41234, 'localhost', function (err, bytes) {
+    if (err) {
+      console.error(err.message)
+    }
     client.close()
   })
 })
 
-server.on('message', function(data) {
+server.on('message', function (data) {
   console.log(parse(data).payload.toString())
   server.close()
 })
@@ -79,17 +82,17 @@ a CoAP packet.
 The JS representation of a CoAP packet is:
 ```js
 {
-    token: Buffer.alloc(4)
-  , code: '0.01'
-  , messageId: 42
-  , payload: Buffer.alloc(200)
-  , options: [{
-        name: 'If-Match'
-      , value: Buffer.alloc(5)
-    }, {
-        name: 'Uri-Path'
-      , value: Buffer.from('hello')
-    }]
+  token: Buffer.alloc(4),
+  code: '0.01',
+  messageId: 42,
+  payload: Buffer.alloc(200),
+  options: [{
+    name: 'If-Match',
+    value: Buffer.alloc(5)
+  }, {
+    name: 'Uri-Path',
+    value: Buffer.from('hello')
+  }]
 }
 ```
 
