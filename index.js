@@ -204,9 +204,7 @@ function parseOptions (buffer) {
   let number = 0
   let delta
   let length
-  const nextOption = true
   const options = []
-  let option
 
   while (index < buffer.length) {
     byte = buffer.readUInt8(index)
@@ -396,7 +394,6 @@ function prepareOptions (packet) {
   let byte
   let option
   let i
-  let bufferSize
   let pos
   let value
 

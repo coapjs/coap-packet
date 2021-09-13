@@ -978,7 +978,7 @@ describe('packet.generate', function () {
 })
 
 describe('parse and generate', function () {
-  let orig, payload
+  let orig
 
   it('should process an empty packet', function () {
     orig = {}
