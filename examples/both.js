@@ -2,7 +2,7 @@
 const dgram    = require('dgram')
     , parse    = require('../').parse
     , generate = require('../').generate
-    , payload  = new Buffer('Hello World')
+    , payload  = Buffer.from('Hello World')
     , message  = generate({ payload: payload })
     , port     = 41234
     , client   = dgram.createSocket("udp4")
