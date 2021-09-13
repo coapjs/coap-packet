@@ -196,7 +196,7 @@ const optionNumberToString = (function genOptionParser () {
   code += 'return \'\' + number'
   code += '}\n'
 
-  return new Function('number', code)
+  return new Function('number', code) /* eslint-disable-line no-new-func */
 })()
 
 function parseOptions (buffer) {
@@ -361,7 +361,7 @@ const optionStringToNumber = (function genOptionParser () {
   code += 'return parseInt(string)'
   code += '}\n'
 
-  return new Function('string', code)
+  return new Function('string', code) /* eslint-disable-line no-new-func */
 })()
 
 const nameMap = Object.keys(numMap).reduce(function (acc, key) {
