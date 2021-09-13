@@ -30,7 +30,7 @@ $: npm install coap-packet --save
 The following example opens an UDP client and UDP server and sends a
 CoAP message between them:
 
-```
+```js
 const dgram       = require('dgram')
     , packet      = require('coap-packet')
     , parse       = packet.parse
