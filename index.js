@@ -330,7 +330,7 @@ function confirmableAckResetMask (packet) {
   } else if (packet.reset) {
     result = 3 << 4
   } else {
-    result = 1 << 4  // the message is non-confirmable
+    result = 1 << 4 // the message is non-confirmable
   }
 
   return result

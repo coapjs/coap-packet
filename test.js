@@ -315,7 +315,7 @@ describe('packet.parse', function () {
         buffer.writeUInt8(parseInt(num) - 13, 5)
 
         packet = parse(buffer)
-        expect(packet.options).to.eql([{ name: option, value: optionValue }])
+        expect(packet.options).to.eql([{ name: option, value: optionValue }])
       })
     })
   })
