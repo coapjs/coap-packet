@@ -29,9 +29,7 @@ const codes = {
 }
 
 module.exports.generate = function generate (packet) {
-  let byte
   let pos = 0
-  let i
 
   packet = fillGenDefaults(packet)
   const options = prepareOptions(packet)
@@ -44,7 +42,7 @@ module.exports.generate = function generate (packet) {
   const buffer = Buffer.alloc(length)
 
   // first byte
-  byte = 0
+  let byte = 0
   byte |= 1 << 6 // first two bits are version
   byte |= confirmableAckResetMask(packet)
   byte |= packet.token.length
@@ -66,7 +64,7 @@ module.exports.generate = function generate (packet) {
   pos += packet.token.length
 
   // write the options
-  for (i = 0; i < options.length; i++) {
+  for (let i = 0; i < options.length; i++) {
     options[i].copy(buffer, pos)
     pos += options[i].length
   }
@@ -200,21 +198,18 @@ const optionNumberToString = (function genOptionParser () {
 })()
 
 function parseOptions (buffer) {
-  let byte
   let number = 0
-  let delta
-  let length
   const options = []
 
   while (index < buffer.length) {
-    byte = buffer.readUInt8(index)
+    const byte = buffer.readUInt8(index)
 
     if (byte === 255 || index > buffer.length) {
       break
     }
 
-    delta = byte >> 4
-    length = byte & 15
+    let delta = byte >> 4
+    let length = byte & 15
 
     index += 1
 
@@ -336,13 +331,12 @@ function confirmableAckResetMask (packet) {
 
 function calculateLength (packet, options) {
   let length = 4 + packet.payload.length + packet.token.length
-  let i
 
   if (packet.code !== '0.00' && packet.payload.toString() !== '') {
     length += 1
   }
 
-  for (i = 0; i < options.length; i++) {
+  for (let i = 0; i < options.length; i++) {
     length += options[i].length
   }
 
