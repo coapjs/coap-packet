@@ -10,6 +10,9 @@ const server = dgram.createSocket('udp4')
 
 server.bind(port, function () {
   client.send(message, 0, message.length, 41234, 'localhost', function (err, bytes) {
+    if (err) {
+      console.error(err.message)
+    }
     client.close()
   })
 })
