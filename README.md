@@ -1,8 +1,7 @@
 CoAP-Packet
 =====
 
-[![Build
-Status](https://travis-ci.org/mcollina/coap-packet.png)](https://travis-ci.org/mcollina/coap-packet)
+![Build Status](https://github.com/mcollina/coap-packet/workflows/Build%20Status/badge.svg)
 
 __CoAP-Packet__ is a generator and parser of CoAP packets for node.js.
 
