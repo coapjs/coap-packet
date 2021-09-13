@@ -35,7 +35,7 @@ const dgram       = require('dgram')
     , packet      = require('coap-packet')
     , parse       = packet.parse
     , generate    = packet.generate
-    , payload     = new Buffer('Hello World')
+    , payload     = Buffer.from('Hello World')
     , message     = generate({ payload: payload })
     , port        = 41234
     , client      = dgram.createSocket("udp4")
@@ -78,16 +78,16 @@ a CoAP packet.
 The JS representation of a CoAP packet is:
 ```js
 {
-    token: new Buffer(4)
+    token: Buffer.alloc(4)
   , code: '0.01'
   , messageId: 42
-  , payload: new Buffer(200)
+  , payload: Buffer.alloc(200)
   , options: [{
         name: 'If-Match'
-      , value: new Buffer(5)
+      , value: Buffer.alloc(5)
     }, {
-        name: 'Uri-Path' 
-      , value: new Buffer('hello')
+        name: 'Uri-Path'
+      , value: Buffer.from('hello')
     }]
 }
 ```
