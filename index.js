@@ -71,7 +71,7 @@ module.exports.generate = function generate (packet) {
     pos += options[i].length
   }
 
-  if (packet.code !== '0.00' && packet.payload != '') {
+  if (packet.code !== '0.00' && packet.payload.toString() !== '') {
     // payload separator
     buffer.writeUInt8(255, pos++)
     packet.payload.copy(buffer, pos)
@@ -99,7 +99,7 @@ module.exports.parse = function parse (buffer) {
     result.options = parseOptions(buffer)
     result.payload = buffer.slice(index + 1)
   } else {
-    if (buffer.length != 4) {
+    if (buffer.length !== 4) {
       throw new Error('Empty messages must be empty')
     }
 
@@ -340,7 +340,7 @@ function calculateLength (packet, options) {
   let length = 4 + packet.payload.length + packet.token.length
   let i
 
-  if (packet.code !== '0.00' && packet.payload != '') {
+  if (packet.code !== '0.00' && packet.payload.toString() !== '') {
     length += 1
   }
 
