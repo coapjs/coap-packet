@@ -46,7 +46,7 @@ module.exports.generate = function generate(packet) {
   if (length > 1280)
     throw new Error('Max packet size is 1280: current is ' + length)
 
-  buffer = new Buffer.alloc(length)
+  buffer = Buffer.alloc(length)
 
   // first byte
   byte = 0
