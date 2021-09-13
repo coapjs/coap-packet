@@ -10,7 +10,7 @@ describe('packet.parse', function() {
   describe('with no options', function() {
 
     function buildPacket(payload) {
-      buffer = new Buffer(5 + payload.length)
+      buffer = Buffer.alloc(5 + payload.length)
 
       byte = 0
       byte |= 1 << 6 // byte two bits are version
@@ -29,7 +29,7 @@ describe('packet.parse', function() {
     }
 
     beforeEach(function() {
-      buildPacket(new Buffer(0))
+      buildPacket(Buffer.alloc(0))
     })
 
     it('should throw if it reads version two', function() {
@@ -72,18 +72,18 @@ describe('packet.parse', function() {
 
     it('should parse the empty payload', function() {
       packet = parse(buffer)
-      expect(packet.payload).to.eql(new Buffer(0))
+      expect(packet.payload).to.eql(Buffer.alloc(0))
     })
 
     it('should parse some payload', function() {
-      var payload = new Buffer('hello matteo')
+      var payload = Buffer.from('hello matteo')
       buildPacket(payload)
       packet = parse(buffer)
       expect(packet.payload).to.eql(payload)
     })
 
     it('should parse some payload (bis)', function() {
-      var payload = new Buffer('hello matteo')
+      var payload = Buffer.from('hello matteo')
       buildPacket(payload)
       packet = parse(buffer)
       expect(packet.payload).to.eql(payload)
@@ -101,7 +101,7 @@ describe('packet.parse', function() {
     })
 
     it('should parse an empty message', function() {
-      buffer = new Buffer(4)
+      buffer = Buffer.alloc(4)
 
       byte = 0
       byte |= 1 << 6 // byte two bits are version
@@ -117,11 +117,11 @@ describe('packet.parse', function() {
       packet = parse(buffer)
 
       expect(packet.code).to.eql('0.00')
-      expect(packet.payload).to.eql(new Buffer(0))
+      expect(packet.payload).to.eql(Buffer.alloc(0))
     })
 
     it('should raise an error if an empty message is longer than 5', function() {
-      buffer = new Buffer(5)
+      buffer = Buffer.alloc(5)
 
       byte = 0
       byte |= 1 << 6 // byte two bits are version
@@ -181,16 +181,16 @@ describe('packet.parse', function() {
 
     it('should have a zero-length token', function() {
       packet = parse(buffer)
-      expect(packet.token).to.eql(new Buffer(0))
+      expect(packet.token).to.eql(Buffer.alloc(0))
     })
   })
 
   describe('with a payload and a single option with unextended number and length', function() {
-    var payload = new Buffer(5)
-    var optionValue = new Buffer(3)
+    var payload = Buffer.alloc(5)
+    var optionValue = Buffer.alloc(3)
 
     beforeEach(function() {
-      buffer = new Buffer(6 + optionValue.length + payload.length)
+      buffer = Buffer.alloc(6 + optionValue.length + payload.length)
       buffer.fill(0)
 
       byte = 0
@@ -236,7 +236,7 @@ describe('packet.parse', function() {
       , 'Uri-Path': 11
       , 'Content-Format': 12
 
-      // this is not specified by the protocol, 
+      // this is not specified by the protocol,
       // but it's needed to check if it can parse
       // numbers
       , '9': 9
@@ -257,11 +257,11 @@ describe('packet.parse', function() {
   })
 
   describe('with a payload and a single option with one-byte extended number and unextended length', function() {
-    var payload = new Buffer(5)
-    var optionValue = new Buffer(3)
+    var payload = Buffer.alloc(5)
+    var optionValue = Buffer.alloc(3)
 
     beforeEach(function() {
-      buffer = new Buffer(7 + optionValue.length + payload.length)
+      buffer = Buffer.alloc(7 + optionValue.length + payload.length)
       buffer.fill(0)
 
       byte = 0
@@ -303,7 +303,7 @@ describe('packet.parse', function() {
       , '39': 'Proxy-Scheme'
       , '60': 'Size1'
 
-      // this is not specified by the protocol, 
+      // this is not specified by the protocol,
       // but it's needed to check if it can parse
       // numbers
       , '16': '16'
@@ -322,11 +322,11 @@ describe('packet.parse', function() {
   })
 
   describe('with a payload and a single option with two-byte extended number and unextended length', function() {
-    var payload = new Buffer(5)
-    var optionValue = new Buffer(3)
+    var payload = Buffer.alloc(5)
+    var optionValue = Buffer.alloc(3)
 
     beforeEach(function() {
-      buffer = new Buffer(8 + optionValue.length + payload.length)
+      buffer = Buffer.alloc(8 + optionValue.length + payload.length)
       buffer.fill(0)
 
       byte = 0
@@ -374,11 +374,11 @@ describe('packet.parse', function() {
   })
 
   describe('with a payload and a single option with unextended number and one-byte extended length', function() {
-    var payload = new Buffer(5)
-    var optionValue = new Buffer(20)
+    var payload = Buffer.alloc(5)
+    var optionValue = Buffer.alloc(20)
 
     beforeEach(function() {
-      buffer = new Buffer(7 + optionValue.length + payload.length)
+      buffer = Buffer.alloc(7 + optionValue.length + payload.length)
       buffer.fill(0)
 
       byte = 0
@@ -417,11 +417,11 @@ describe('packet.parse', function() {
   })
 
   describe('with a payload and a single option with unextended number and two-byte extended length', function() {
-    var payload = new Buffer(5)
-    var optionValue = new Buffer(1024)
+    var payload = Buffer.alloc(5)
+    var optionValue = Buffer.alloc(1024)
 
     beforeEach(function() {
-      buffer = new Buffer(8 + optionValue.length + payload.length)
+      buffer = Buffer.alloc(8 + optionValue.length + payload.length)
       buffer.fill(0)
 
       byte = 0
@@ -460,11 +460,11 @@ describe('packet.parse', function() {
   })
 
   describe('with a payload and a single option with both number and length extended by one byte', function() {
-    var payload = new Buffer(5)
-    var optionValue = new Buffer(20)
+    var payload = Buffer.alloc(5)
+    var optionValue = Buffer.alloc(20)
 
     beforeEach(function() {
-      buffer = new Buffer(8 + optionValue.length + payload.length)
+      buffer = Buffer.alloc(8 + optionValue.length + payload.length)
       buffer.fill(0)
 
       byte = 0
@@ -506,11 +506,11 @@ describe('packet.parse', function() {
   })
 
   describe('with a payload and two unextended options', function() {
-    var payload = new Buffer(5)
-    var optionValue = new Buffer(3)
+    var payload = Buffer.alloc(5)
+    var optionValue = Buffer.alloc(3)
 
     beforeEach(function() {
-      buffer = new Buffer(7 + optionValue.length * 2 + payload.length)
+      buffer = Buffer.alloc(7 + optionValue.length * 2 + payload.length)
       buffer.fill(0)
 
       byte = 0
@@ -558,7 +558,7 @@ describe('packet.parse', function() {
       , 'Uri-Path': 11
       , 'Content-Format': 12
 
-      // this is not specified by the protocol, 
+      // this is not specified by the protocol,
       // but it's needed to check if it can parse
       // numbers
       , '9': 9
@@ -585,12 +585,12 @@ describe('packet.parse', function() {
   })
 
   describe('with a payload an unextended option and a token', function() {
-    var payload = new Buffer(5)
-    var optionValue = new Buffer(3)
-    var token = new Buffer(3)
+    var payload = Buffer.alloc(5)
+    var optionValue = Buffer.alloc(3)
+    var token = Buffer.alloc(3)
 
     beforeEach(function() {
-      buffer = new Buffer(6 + token.length + optionValue.length + payload.length)
+      buffer = Buffer.alloc(6 + token.length + optionValue.length + payload.length)
       buffer.fill(0)
 
       byte = 0
@@ -705,19 +705,19 @@ describe('packet.generate', function() {
     })
 
     it('should generate a payload marker', function() {
-      payload = new Buffer(42)
+      payload = Buffer.alloc(42)
       buffer = generate({ payload: payload })
       expect(buffer.readUInt8(4)).to.eql(0xFF)
     })
 
     it('should generate a payload', function() {
-      payload = new Buffer(42)
+      payload = Buffer.alloc(42)
       buffer = generate({ payload: payload })
       expect(buffer.slice(5)).to.eql(payload)
     })
 
     it('should error if the resulting message is greater than 1280', function() {
-      payload = new Buffer(1280 - 4) // the basic headers are 4
+      payload = Buffer.alloc(1280 - 4) // the basic headers are 4
       expect(generate.bind(null, { payload: payload })).to.throw('Max packet size is 1280: current is 1281')
     })
 
@@ -727,20 +727,20 @@ describe('packet.generate', function() {
     })
 
     it('should generate a token', function() {
-      token = new Buffer(3)
+      token = Buffer.alloc(3)
       buffer = generate({ token: token })
       expect(buffer.slice(4, 7)).to.eql(token)
     })
 
     it('should generate the token length', function() {
-      token = new Buffer(3)
+      token = Buffer.alloc(3)
       buffer = generate({ token: token })
       byte = buffer.readUInt8(0) & parseInt('00001111', 2)
       expect(byte).to.equal(3)
     })
 
     it('should have a maximum token length of 8', function() {
-      token = new Buffer(9)
+      token = Buffer.alloc(9)
       expect(generate.bind(null, { token: token })).to.throw('Token too long')
     })
 
@@ -782,7 +782,7 @@ describe('packet.generate', function() {
       , 'Uri-Path': 11
       , 'Content-Format': 12
 
-      // this is not specified by the protocol, 
+      // this is not specified by the protocol,
       // but it's needed to check if it can parse
       // numbers
       , '9': 9
@@ -793,7 +793,7 @@ describe('packet.generate', function() {
         packet = {
           options: [{
               name: option
-            , value: new Buffer(5)
+            , value: Buffer.alloc(5)
           }]
         }
 
@@ -808,7 +808,7 @@ describe('packet.generate', function() {
         packet = {
           options: [{
               name: option
-            , value: new Buffer(20)
+            , value: Buffer.alloc(20)
           }]
         }
 
@@ -824,7 +824,7 @@ describe('packet.generate', function() {
         packet = {
           options: [{
               name: option
-            , value: new Buffer(300)
+            , value: Buffer.alloc(300)
           }]
         }
 
@@ -841,10 +841,10 @@ describe('packet.generate', function() {
           packet = {
             options: [{
                 name: option
-              , value: new Buffer(5)
+              , value: Buffer.alloc(5)
             }, {
                 name: 'If-Match'
-              , value: new Buffer(5)
+              , value: Buffer.alloc(5)
             }]
           }
 
@@ -876,7 +876,7 @@ describe('packet.generate', function() {
         packet = {
           options: [{
               name: option
-            , value: new Buffer(5)
+            , value: Buffer.alloc(5)
           }]
         }
 
@@ -892,7 +892,7 @@ describe('packet.generate', function() {
         packet = {
           options: [{
               name: option
-            , value: new Buffer(20)
+            , value: Buffer.alloc(20)
           }]
         }
 
@@ -909,7 +909,7 @@ describe('packet.generate', function() {
         packet = {
           options: [{
               name: option
-            , value: new Buffer(300)
+            , value: Buffer.alloc(300)
           }]
         }
 
@@ -930,7 +930,7 @@ describe('packet.generate', function() {
         packet = {
           options: [{
               name: option
-            , value: new Buffer(5)
+            , value: Buffer.alloc(5)
           }]
         }
 
@@ -946,7 +946,7 @@ describe('packet.generate', function() {
         packet = {
           options: [{
               name: option
-            , value: new Buffer(20)
+            , value: Buffer.alloc(20)
           }]
         }
 
@@ -963,7 +963,7 @@ describe('packet.generate', function() {
         packet = {
           options: [{
               name: option
-            , value: new Buffer(300)
+            , value: Buffer.alloc(300)
           }]
         }
 
@@ -989,7 +989,7 @@ describe('parse and generate', function() {
   })
 
   it('should process a payload', function() {
-    orig = { payload: new Buffer(5) }
+    orig = { payload: Buffer.alloc(5) }
     // orig will be filled with the defaults by generate
     expect(parse(generate(orig))).to.eql(orig)
   })
@@ -998,7 +998,7 @@ describe('parse and generate', function() {
     orig = {
       options: [{
           name: 'If-Match'
-        , value: new Buffer(5)
+        , value: Buffer.alloc(5)
       }]
     }
 
@@ -1008,16 +1008,16 @@ describe('parse and generate', function() {
 
   it('should process a packet with all stuff', function() {
     orig = {
-        token: new Buffer(4)
+        token: Buffer.alloc(4)
       , code: '0.01'
       , messageId: 42
-      , payload: new Buffer(400)
+      , payload: Buffer.alloc(400)
       , options: [{
             name: 'If-Match'
-          , value: new Buffer(5)
+          , value: Buffer.alloc(5)
         }, {
-            name: 'Uri-Path' 
-          , value: new Buffer('hello')
+            name: 'Uri-Path'
+          , value: Buffer.from('hello')
         }]
     }
 
@@ -1043,19 +1043,19 @@ describe('parse and generate', function() {
 
   it('should process a packet with Uri-Path and Observe', function() {
     orig = {
-        token: new Buffer(4)
+        token: Buffer.alloc(4)
       , code: '2.05'
       , messageId: 42
-      , payload: new Buffer(400)
+      , payload: Buffer.alloc(400)
       , options: [{
             name: 'Uri-Path'
-          , value: new Buffer('aaa')
+          , value: Buffer.from('aaa')
         }, {
-            name: 'Uri-Path' 
-          , value: new Buffer('bbb')
+            name: 'Uri-Path'
+          , value: Buffer.from('bbb')
         }, {
             name: 'Observe'
-          , value: new Buffer([42])
+          , value: Buffer.from([42])
         }]
     }
 
