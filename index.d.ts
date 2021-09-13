@@ -18,7 +18,7 @@ export type OptionName =
     | "Proxy-Scheme"
     | "Size1";
 
-export type CoapMethod = "GET" | "POST" | "PUT" | "DELETE";
+export type CoapMethod = "GET" | "POST" | "PUT" | "DELETE" | "FETCH" | "PATCH" | "iPATCH";
 
 export interface Packet {
     token?: Buffer;

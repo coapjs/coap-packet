@@ -18,10 +18,16 @@ codes = {
   , 'POST': 2
   , 'PUT': 3
   , 'DELETE': 4
+  , 'FETCH': 5
+  , 'PATCH': 6
+  , 'iPATCH': 7
   , 'get': 1
   , 'post': 2
   , 'put': 3
   , 'delete': 4
+  , 'fetch': 5
+  , 'patch': 6
+  , 'ipatch': 7
 }
 
 module.exports.generate = function generate(packet) {
@@ -289,7 +295,7 @@ function fillGenDefaults(packet) {
   if (!packet.code)
     packet.code = '0.01'
 
-  if (!packet.messageId)
+  if (packet.messageId == null)
     packet.messageId = nextMsgId++
 
   if (!packet.options)
