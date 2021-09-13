@@ -1,20 +1,20 @@
 
-const dgram    = require('dgram')
-    , parse    = require('../').parse
-    , generate = require('../').generate
-    , payload  = Buffer.from('Hello World')
-    , message  = generate({ payload: payload })
-    , port     = 41234
-    , client   = dgram.createSocket("udp4")
-    , server   = dgram.createSocket("udp4")
+const dgram = require('dgram')
+const parse = require('../').parse
+const generate = require('../').generate
+const payload = Buffer.from('Hello World')
+const message = generate({ payload: payload })
+const port = 41234
+const client = dgram.createSocket('udp4')
+const server = dgram.createSocket('udp4')
 
-server.bind(port, function() {
-  client.send(message, 0, message.length, 41234, "localhost", function(err, bytes) {
+server.bind(port, function () {
+  client.send(message, 0, message.length, 41234, 'localhost', function (err, bytes) {
     client.close()
   })
 })
 
-server.on('message', function(data) {
+server.on('message', function (data) {
   console.log(parse(data).payload.toString())
   server.close()
 })

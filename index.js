@@ -1,50 +1,50 @@
 
-var empty = Buffer.alloc(0)
+const empty = Buffer.alloc(0)
 
-  // a global index for parsing the options and the payload
-  // we can do this as the parsing is a sync operation
-  , index
+// a global index for parsing the options and the payload
+// we can do this as the parsing is a sync operation
+let index
 
-  // last five bits are 1
-  // 31.toString(2) => '111111'
-  , lowerCodeMask = 31
+// last five bits are 1
+// 31.toString(2) => '111111'
+const lowerCodeMask = 31
 
-  , nextMsgId = Math.floor(Math.random() * 65535)
+let nextMsgId = Math.floor(Math.random() * 65535)
 
-  , codes
+let codes
 
 codes = {
-    'GET': 1
-  , 'POST': 2
-  , 'PUT': 3
-  , 'DELETE': 4
-  , 'FETCH': 5
-  , 'PATCH': 6
-  , 'iPATCH': 7
-  , 'get': 1
-  , 'post': 2
-  , 'put': 3
-  , 'delete': 4
-  , 'fetch': 5
-  , 'patch': 6
-  , 'ipatch': 7
+  GET: 1,
+  POST: 2,
+  PUT: 3,
+  DELETE: 4,
+  FETCH: 5,
+  PATCH: 6,
+  iPATCH: 7,
+  get: 1,
+  post: 2,
+  put: 3,
+  delete: 4,
+  fetch: 5,
+  patch: 6,
+  ipatch: 7
 }
 
-module.exports.generate = function generate(packet) {
-
-  var buffer
-    , byte
-    , pos = 0
-    , options
-    , i
-    , length
+module.exports.generate = function generate (packet) {
+  let buffer
+  let byte
+  let pos = 0
+  let options
+  let i
+  let length
 
   packet = fillGenDefaults(packet)
   options = prepareOptions(packet)
   length = calculateLength(packet, options)
 
-  if (length > 1280)
+  if (length > 1280) {
     throw new Error('Max packet size is 1280: current is ' + length)
+  }
 
   buffer = Buffer.alloc(length)
 
@@ -56,10 +56,11 @@ module.exports.generate = function generate(packet) {
   buffer.writeUInt8(byte, pos++)
 
   // code can be humized or not
-  if (codes[packet.code])
+  if (codes[packet.code]) {
     buffer.writeUInt8(codes[packet.code], pos++)
-  else
+  } else {
     buffer.writeUInt8(toCode(packet.code), pos++)
+  }
 
   // two bytes for the message id
   buffer.writeUInt16BE(packet.messageId, pos)
@@ -76,7 +77,6 @@ module.exports.generate = function generate(packet) {
   }
 
   if (packet.code !== '0.00' && packet.payload != '') {
-
     // payload separator
     buffer.writeUInt8(255, pos++)
     packet.payload.copy(buffer, pos)
@@ -85,27 +85,28 @@ module.exports.generate = function generate(packet) {
   return buffer
 }
 
-module.exports.parse = function parse(buffer) {
+module.exports.parse = function parse (buffer) {
   index = 4
   parseVersion(buffer)
 
-  var result = {
-      code: parseCode(buffer)
-    , confirmable: parseConfirmable(buffer)
-    , reset: parseReset(buffer)
-    , ack: parseAck(buffer)
-    , messageId: buffer.readUInt16BE(2)
-    , token: parseToken(buffer)
-    , options: null
-    , payload: null
+  const result = {
+    code: parseCode(buffer),
+    confirmable: parseConfirmable(buffer),
+    reset: parseReset(buffer),
+    ack: parseAck(buffer),
+    messageId: buffer.readUInt16BE(2),
+    token: parseToken(buffer),
+    options: null,
+    payload: null
   }
 
   if (result.code !== '0.00') {
     result.options = parseOptions(buffer)
     result.payload = buffer.slice(index + 1)
   } else {
-    if (buffer.length != 4)
+    if (buffer.length != 4) {
       throw new Error('Empty messages must be empty')
+    }
 
     result.options = []
     result.payload = empty
@@ -114,46 +115,48 @@ module.exports.parse = function parse(buffer) {
   return result
 }
 
-function parseVersion(buffer) {
-  var version = buffer.readUInt8(0) >> 6
+function parseVersion (buffer) {
+  const version = buffer.readUInt8(0) >> 6
 
-  if (version !== 1)
+  if (version !== 1) {
     throw new Error('Unsupported version')
+  }
 
   return version
 }
 
-function parseConfirmable(buffer) {
+function parseConfirmable (buffer) {
   return (buffer.readUInt8(0) & 48) === 0
 }
 
-function parseReset(buffer) {
+function parseReset (buffer) {
   // 110000 is 48
   return (buffer.readUInt8(0) & 48) === 48
 }
 
-function parseAck(buffer) {
+function parseAck (buffer) {
   // 100000 is 32
   return (buffer.readUInt8(0) & 48) === 32
 }
 
-function parseCode(buffer) {
-  var byte = buffer.readUInt8(1)
-    , code = '' + (byte >> 5) + '.'
+function parseCode (buffer) {
+  let byte = buffer.readUInt8(1)
+  let code = '' + (byte >> 5) + '.'
 
   byte = byte & lowerCodeMask
 
-  if (byte < 10)
+  if (byte < 10) {
     code += '0' + byte
-  else
+  } else {
     code += byte
+  }
 
   return code
 }
 
-function parseToken(buffer) {
-  var length = buffer.readUInt8(0) & 15
-    , result
+function parseToken (buffer) {
+  const length = buffer.readUInt8(0) & 15
+  let result
 
   if (length > 8) {
     throw new Error('Token length not allowed')
@@ -166,33 +169,31 @@ function parseToken(buffer) {
   return result
 }
 
-var numMap  = {
-    '1': 'If-Match'
-  , '3': 'Uri-Host'
-  , '4': 'ETag'
-  , '5': 'If-None-Match'
-  , '6': 'Observe'
-  , '7': 'Uri-Port'
-  , '8': 'Location-Path'
-  , '11': 'Uri-Path'
-  , '12': 'Content-Format'
-  , '14': 'Max-Age'
-  , '15': 'Uri-Query'
-  , '17': 'Accept'
-  , '20': 'Location-Query'
-  , '23': 'Block2'
-  , '27': 'Block1'
-  , '35': 'Proxy-Uri'
-  , '39': 'Proxy-Scheme'
-  , '60': 'Size1'
+const numMap = {
+  1: 'If-Match',
+  3: 'Uri-Host',
+  4: 'ETag',
+  5: 'If-None-Match',
+  6: 'Observe',
+  7: 'Uri-Port',
+  8: 'Location-Path',
+  11: 'Uri-Path',
+  12: 'Content-Format',
+  14: 'Max-Age',
+  15: 'Uri-Query',
+  17: 'Accept',
+  20: 'Location-Query',
+  23: 'Block2',
+  27: 'Block1',
+  35: 'Proxy-Uri',
+  39: 'Proxy-Scheme',
+  60: 'Size1'
 }
 
-var optionNumberToString = (function genOptionParser() {
-
-  var code = Object.keys(numMap).reduce(function(acc, key) {
-
+const optionNumberToString = (function genOptionParser () {
+  let code = Object.keys(numMap).reduce(function (acc, key) {
     acc += 'case ' + key + ':\n'
-    acc += '  return \'' + numMap[key] +'\'\n'
+    acc += '  return \'' + numMap[key] + '\'\n'
 
     return acc
   }, 'switch(number) {\n')
@@ -204,15 +205,14 @@ var optionNumberToString = (function genOptionParser() {
   return new Function('number', code)
 })()
 
-function parseOptions(buffer) {
-
-  var byte
-    , number = 0
-    , delta
-    , length
-    , nextOption = true
-    , options = []
-    , option
+function parseOptions (buffer) {
+  let byte
+  let number = 0
+  let delta
+  let length
+  const nextOption = true
+  const options = []
+  let option
 
   while (index < buffer.length) {
     byte = buffer.readUInt8(index)
@@ -249,8 +249,8 @@ function parseOptions(buffer) {
     number += delta
 
     options.push({
-        name: optionNumberToString(number)
-      , value: buffer.slice(index, index + length)
+      name: optionNumberToString(number),
+      value: buffer.slice(index, index + length)
     })
 
     index += length
@@ -259,17 +259,17 @@ function parseOptions(buffer) {
   return options
 }
 
-function toCode(code) {
-  var split = code.split && code.split('.')
-    , by = 0
+function toCode (code) {
+  const split = code.split && code.split('.')
+  let by = 0
 
   if (split && split.length === 2) {
     by |= parseInt(split[0]) << 5
     by |= parseInt(split[1])
   } else {
-
-    if (!split)
+    if (!split) {
       code = parseInt(code)
+    }
 
     by |= (code / 100) << 5
     by |= (code % 100)
@@ -278,65 +278,77 @@ function toCode(code) {
   return by
 }
 
-function fillGenDefaults(packet) {
-
-  if (!packet)
+function fillGenDefaults (packet) {
+  if (!packet) {
     packet = {}
+  }
 
-  if (!packet.payload)
+  if (!packet.payload) {
     packet.payload = empty
+  }
 
-  if (!packet.token)
+  if (!packet.token) {
     packet.token = empty
+  }
 
-  if (packet.token.length > 8)
+  if (packet.token.length > 8) {
     throw new Error('Token too long')
+  }
 
-  if (!packet.code)
+  if (!packet.code) {
     packet.code = '0.01'
+  }
 
-  if (packet.messageId == null)
+  if (packet.messageId == null) {
     packet.messageId = nextMsgId++
+  }
 
-  if (!packet.options)
+  if (!packet.options) {
     packet.options = []
+  }
 
-  if (nextMsgId === 65535)
+  if (nextMsgId === 65535) {
     nextMsgId = 0
+  }
 
-  if (!packet.confirmable)
+  if (!packet.confirmable) {
     packet.confirmable = false
+  }
 
-  if (!packet.reset)
+  if (!packet.reset) {
     packet.reset = false
+  }
 
-  if (!packet.ack)
+  if (!packet.ack) {
     packet.ack = false
+  }
 
   return packet
 }
 
-function confirmableAckResetMask(packet) {
-  var result
+function confirmableAckResetMask (packet) {
+  let result
 
-  if (packet.confirmable)
+  if (packet.confirmable) {
     result = 0 << 4
-  else if (packet.ack)
+  } else if (packet.ack) {
     result = 2 << 4
-  else if (packet.reset)
+  } else if (packet.reset) {
     result = 3 << 4
-  else
-    result = 1 << 4 // the message is non-confirmable
+  } else {
+    result = 1 << 4  // the message is non-confirmable
+  }
 
   return result
 }
 
-function calculateLength(packet, options) {
-  var length = 4 + packet.payload.length + packet.token.length
-    , i
+function calculateLength (packet, options) {
+  let length = 4 + packet.payload.length + packet.token.length
+  let i
 
-  if (packet.code !== '0.00' && packet.payload != '')
+  if (packet.code !== '0.00' && packet.payload != '') {
     length += 1
+  }
 
   for (i = 0; i < options.length; i++) {
     length += options[i].length
@@ -345,12 +357,10 @@ function calculateLength(packet, options) {
   return length
 }
 
-var optionStringToNumber = (function genOptionParser() {
-
-  var code = Object.keys(numMap).reduce(function(acc, key) {
-
+const optionStringToNumber = (function genOptionParser () {
+  let code = Object.keys(numMap).reduce(function (acc, key) {
     acc += 'case \'' + numMap[key] + '\':\n'
-    acc += '  return \'' + key +'\'\n'
+    acc += '  return \'' + key + '\'\n'
 
     return acc
   }, 'switch(string) {\n')
@@ -362,37 +372,39 @@ var optionStringToNumber = (function genOptionParser() {
   return new Function('string', code)
 })()
 
-var nameMap = Object.keys(numMap).reduce(function(acc, key) {
+const nameMap = Object.keys(numMap).reduce(function (acc, key) {
   acc[numMap[key]] = key
   return acc
 }, {})
 
-function optionSorter(a, b) {
+function optionSorter (a, b) {
   a = a.name
   b = b.name
 
   a = parseInt(nameMap[a] || a)
   b = parseInt(nameMap[b] || b)
 
-  if (a < b)
+  if (a < b) {
     return -1
-  if (a > b)
+  }
+  if (a > b) {
     return 1
+  }
 
   return 0
 }
 
-function prepareOptions(packet) {
-  var options = []
-    , total = 0
-    , delta
-    , buffer
-    , byte
-    , option
-    , i
-    , bufferSize
-    , pos
-    , value
+function prepareOptions (packet) {
+  const options = []
+  let total = 0
+  let delta
+  let buffer
+  let byte
+  let option
+  let i
+  let bufferSize
+  let pos
+  let value
 
   packet.options.sort(optionSorter)
 
@@ -406,7 +418,6 @@ function prepareOptions(packet) {
     buffer = Buffer.alloc(value.length + 5)
 
     byte = 0
-
 
     if (delta <= 12) {
       byte |= delta << 4
