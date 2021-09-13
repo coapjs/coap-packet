@@ -295,7 +295,7 @@ function fillGenDefaults(packet) {
   if (!packet.code)
     packet.code = '0.01'
 
-  if (!packet.messageId)
+  if (packet.messageId == null)
     packet.messageId = nextMsgId++
 
   if (!packet.options)
