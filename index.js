@@ -11,9 +11,7 @@ const lowerCodeMask = 31
 
 let nextMsgId = Math.floor(Math.random() * 65535)
 
-let codes
-
-codes = {
+const codes = {
   GET: 1,
   POST: 2,
   PUT: 3,
@@ -31,22 +29,19 @@ codes = {
 }
 
 module.exports.generate = function generate (packet) {
-  let buffer
   let byte
   let pos = 0
-  let options
   let i
-  let length
 
   packet = fillGenDefaults(packet)
-  options = prepareOptions(packet)
-  length = calculateLength(packet, options)
+  const options = prepareOptions(packet)
+  const length = calculateLength(packet, options)
 
   if (length > 1280) {
     throw new Error('Max packet size is 1280: current is ' + length)
   }
 
-  buffer = Buffer.alloc(length)
+  const buffer = Buffer.alloc(length)
 
   // first byte
   byte = 0
@@ -156,13 +151,12 @@ function parseCode (buffer) {
 
 function parseToken (buffer) {
   const length = buffer.readUInt8(0) & 15
-  let result
 
   if (length > 8) {
     throw new Error('Token length not allowed')
   }
 
-  result = buffer.slice(index, index + length)
+  const result = buffer.slice(index, index + length)
 
   index += length
 
