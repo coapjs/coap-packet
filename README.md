@@ -12,8 +12,7 @@ What is CoAP?
 intended to be used in very simple electronics devices that allows them
 to communicate interactively over the Internet. -  Wikipedia
 
-This library follows the
-[draft-18](http://tools.ietf.org/html/draft-ietf-core-coap-18) of the standard.
+This library follows [RFC 7252](https://datatracker.ietf.org/doc/html/rfc7252) and [RFC 8132](https://datatracker.ietf.org/doc/html/rfc8132).
 
 It does not provide any CoAP semantics, it just parses the protocol.
 
