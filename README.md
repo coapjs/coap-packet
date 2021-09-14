@@ -3,6 +3,7 @@ CoAP-Packet
 
 ![Build Status](https://github.com/mcollina/coap-packet/workflows/Build%20Status/badge.svg)
 [![Coverage Status](https://coveralls.io/repos/github/mcollina/coap-packet/badge.svg?branch=master)](https://coveralls.io/github/mcollina/coap-packet?branch=master)
+[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
 __CoAP-Packet__ is a generator and parser of CoAP packets for node.js.
 
@@ -11,14 +12,13 @@ What is CoAP?
 intended to be used in very simple electronics devices that allows them
 to communicate interactively over the Internet. -  Wikipedia
 
-This library follows the
-[draft-18](http://tools.ietf.org/html/draft-ietf-core-coap-18) of the standard.
+This library follows [RFC 7252](https://datatracker.ietf.org/doc/html/rfc7252) and [RFC 8132](https://datatracker.ietf.org/doc/html/rfc8132).
 
 It does not provide any CoAP semantics, it just parses the protocol.
 
 **CoAP-packet** is an **OPEN Open Source Project**, see the <a href="#contributing">Contributing</a> section to find out what this means.
 
-This has been tested only on node v0.10.
+The library is being tested on Node versions 12, 14, and 16.
 
 ## Installation
 
@@ -32,23 +32,26 @@ The following example opens an UDP client and UDP server and sends a
 CoAP message between them:
 
 ```js
-const dgram       = require('dgram')
-    , packet      = require('coap-packet')
-    , parse       = packet.parse
-    , generate    = packet.generate
-    , payload     = Buffer.from('Hello World')
-    , message     = generate({ payload: payload })
-    , port        = 41234
-    , client      = dgram.createSocket("udp4")
-    , server      = dgram.createSocket("udp4")
+const dgram = require('dgram')
+const packet = require('coap-packet')
+const parse = packet.parse
+const generate = packet.generate
+const payload = Buffer.from('Hello World')
+const message = generate({ payload: payload })
+const port = 41234
+const client = dgram.createSocket('udp4')
+const server = dgram.createSocket('udp4')
 
-server.bind(port, function() {
-  client.send(message, 0, message.length, 41234, "localhost", function(err, bytes) {
+server.bind(port, function () {
+  client.send(message, 0, message.length, 41234, 'localhost', function (err, bytes) {
+    if (err) {
+      console.error(err.message)
+    }
     client.close()
   })
 })
 
-server.on('message', function(data) {
+server.on('message', function (data) {
   console.log(parse(data).payload.toString())
   server.close()
 })
@@ -79,17 +82,17 @@ a CoAP packet.
 The JS representation of a CoAP packet is:
 ```js
 {
-    token: Buffer.alloc(4)
-  , code: '0.01'
-  , messageId: 42
-  , payload: Buffer.alloc(200)
-  , options: [{
-        name: 'If-Match'
-      , value: Buffer.alloc(5)
-    }, {
-        name: 'Uri-Path'
-      , value: Buffer.from('hello')
-    }]
+  token: Buffer.alloc(4),
+  code: '0.01',
+  messageId: 42,
+  payload: Buffer.alloc(200),
+  options: [{
+    name: 'If-Match',
+    value: Buffer.alloc(5)
+  }, {
+    name: 'Uri-Path',
+    value: Buffer.from('hello')
+  }]
 }
 ```
 

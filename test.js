@@ -315,7 +315,7 @@ describe('packet.parse', function () {
         buffer.writeUInt8(parseInt(num) - 13, 5)
 
         packet = parse(buffer)
-        expect(packet.options).to.eql([{ name: option, value: optionValue }])
+        expect(packet.options).to.eql([{ name: option, value: optionValue }])
       })
     })
   })
@@ -978,7 +978,7 @@ describe('packet.generate', function () {
 })
 
 describe('parse and generate', function () {
-  let orig, payload
+  let orig
 
   it('should process an empty packet', function () {
     orig = {}

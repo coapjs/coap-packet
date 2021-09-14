@@ -11,9 +11,7 @@ const lowerCodeMask = 31
 
 let nextMsgId = Math.floor(Math.random() * 65535)
 
-let codes
-
-codes = {
+const codes = {
   GET: 1,
   POST: 2,
   PUT: 3,
@@ -31,25 +29,20 @@ codes = {
 }
 
 module.exports.generate = function generate (packet) {
-  let buffer
-  let byte
   let pos = 0
-  let options
-  let i
-  let length
 
   packet = fillGenDefaults(packet)
-  options = prepareOptions(packet)
-  length = calculateLength(packet, options)
+  const options = prepareOptions(packet)
+  const length = calculateLength(packet, options)
 
   if (length > 1280) {
     throw new Error('Max packet size is 1280: current is ' + length)
   }
 
-  buffer = Buffer.alloc(length)
+  const buffer = Buffer.alloc(length)
 
   // first byte
-  byte = 0
+  let byte = 0
   byte |= 1 << 6 // first two bits are version
   byte |= confirmableAckResetMask(packet)
   byte |= packet.token.length
@@ -71,12 +64,12 @@ module.exports.generate = function generate (packet) {
   pos += packet.token.length
 
   // write the options
-  for (i = 0; i < options.length; i++) {
+  for (let i = 0; i < options.length; i++) {
     options[i].copy(buffer, pos)
     pos += options[i].length
   }
 
-  if (packet.code !== '0.00' && packet.payload != '') {
+  if (packet.code !== '0.00' && packet.payload.toString() !== '') {
     // payload separator
     buffer.writeUInt8(255, pos++)
     packet.payload.copy(buffer, pos)
@@ -104,7 +97,7 @@ module.exports.parse = function parse (buffer) {
     result.options = parseOptions(buffer)
     result.payload = buffer.slice(index + 1)
   } else {
-    if (buffer.length != 4) {
+    if (buffer.length !== 4) {
       throw new Error('Empty messages must be empty')
     }
 
@@ -156,13 +149,12 @@ function parseCode (buffer) {
 
 function parseToken (buffer) {
   const length = buffer.readUInt8(0) & 15
-  let result
 
   if (length > 8) {
     throw new Error('Token length not allowed')
   }
 
-  result = buffer.slice(index, index + length)
+  const result = buffer.slice(index, index + length)
 
   index += length
 
@@ -202,27 +194,22 @@ const optionNumberToString = (function genOptionParser () {
   code += 'return \'\' + number'
   code += '}\n'
 
-  return new Function('number', code)
+  return new Function('number', code) /* eslint-disable-line no-new-func */
 })()
 
 function parseOptions (buffer) {
-  let byte
   let number = 0
-  let delta
-  let length
-  const nextOption = true
   const options = []
-  let option
 
   while (index < buffer.length) {
-    byte = buffer.readUInt8(index)
+    const byte = buffer.readUInt8(index)
 
     if (byte === 255 || index > buffer.length) {
       break
     }
 
-    delta = byte >> 4
-    length = byte & 15
+    let delta = byte >> 4
+    let length = byte & 15
 
     index += 1
 
@@ -336,7 +323,7 @@ function confirmableAckResetMask (packet) {
   } else if (packet.reset) {
     result = 3 << 4
   } else {
-    result = 1 << 4  // the message is non-confirmable
+    result = 1 << 4 // the message is non-confirmable
   }
 
   return result
@@ -344,13 +331,12 @@ function confirmableAckResetMask (packet) {
 
 function calculateLength (packet, options) {
   let length = 4 + packet.payload.length + packet.token.length
-  let i
 
-  if (packet.code !== '0.00' && packet.payload != '') {
+  if (packet.code !== '0.00' && packet.payload.toString() !== '') {
     length += 1
   }
 
-  for (i = 0; i < options.length; i++) {
+  for (let i = 0; i < options.length; i++) {
     length += options[i].length
   }
 
@@ -369,7 +355,7 @@ const optionStringToNumber = (function genOptionParser () {
   code += 'return parseInt(string)'
   code += '}\n'
 
-  return new Function('string', code)
+  return new Function('string', code) /* eslint-disable-line no-new-func */
 })()
 
 const nameMap = Object.keys(numMap).reduce(function (acc, key) {
@@ -402,7 +388,6 @@ function prepareOptions (packet) {
   let byte
   let option
   let i
-  let bufferSize
   let pos
   let value
 
