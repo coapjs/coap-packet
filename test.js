@@ -238,7 +238,7 @@ describe('packet.parse', function () {
       // this is not specified by the protocol,
       // but it's needed to check if it can parse
       // numbers
-      9: 9
+      10: 10
     }
 
     Object.keys(options).forEach(function (option) {
@@ -305,7 +305,7 @@ describe('packet.parse', function () {
       // this is not specified by the protocol,
       // but it's needed to check if it can parse
       // numbers
-      16: '16'
+      13: '13'
     }
 
     Object.keys(options).forEach(function (num) {
@@ -560,7 +560,7 @@ describe('packet.parse', function () {
       // this is not specified by the protocol,
       // but it's needed to check if it can parse
       // numbers
-      9: 9
+      10: 10
     }
 
     Object.keys(options).forEach(function (option) {
@@ -857,9 +857,9 @@ describe('packet.generate', function () {
     })
 
     const longOptions = {
+      13: 13, // unknown, just to be sure it parses
       'Max-Age': 14,
       'Uri-Query': 15,
-      16: 16, // unknown, just to be sure it parses
       Accept: 17,
       'Location-Query': 20,
       Block2: 23,
