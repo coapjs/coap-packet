@@ -866,7 +866,8 @@ describe('packet.generate', function () {
       Block1: 27,
       'Proxy-Uri': 35,
       'Proxy-Scheme': 39,
-      Size1: 60
+      Size1: 60,
+      'No-Response': 258
     }
 
     Object.keys(longOptions).forEach(function (option) {
@@ -921,8 +922,15 @@ describe('packet.generate', function () {
       })
     })
 
-    ;['560', '720'].forEach(function (option) {
-      const optionNum = '' + option
+    const evenLongerOptions = {
+      560: 560,
+      720: 720,
+      'OCF-Accept-Content-Format-Version': 2049,
+      'OCF-Content-Format-Version': 2053
+    }
+
+    Object.keys(evenLongerOptions).forEach(function (option) {
+      const optionNum = evenLongerOptions[option]
 
       it('should generate ' + option + ' option with unextended length', function () {
         packet = {
