@@ -169,17 +169,25 @@ const numMap = {
   6: 'Observe',
   7: 'Uri-Port',
   8: 'Location-Path',
+  9: 'OSCORE',
   11: 'Uri-Path',
   12: 'Content-Format',
   14: 'Max-Age',
   15: 'Uri-Query',
+  16: 'Hop-Limit',
   17: 'Accept',
+  19: 'Q-Block1',
   20: 'Location-Query',
   23: 'Block2',
   27: 'Block1',
+  28: 'Size2',
+  31: 'Q-Block2',
   35: 'Proxy-Uri',
   39: 'Proxy-Scheme',
-  60: 'Size1'
+  60: 'Size1',
+  258: 'No-Response',
+  2049: 'OCF-Accept-Content-Format-Version',
+  2053: 'OCF-Content-Format-Version'
 }
 
 const optionNumberToString = (function genOptionParser () {

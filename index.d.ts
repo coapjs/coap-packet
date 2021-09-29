@@ -7,16 +7,24 @@ export type OptionName =
     | "Uri-Port"
     | "Location-Path"
     | "Uri-Path"
+    | "OSCORE"
     | "Content-Format"
     | "Max-Age"
     | "Uri-Query"
+    | "Hop-Limit"
     | "Accept"
+    | "Q-Block1"
     | "Location-Query"
     | "Block2"
     | "Block1"
+    | "Size2"
+    | "Q-Block2"
     | "Proxy-Uri"
     | "Proxy-Scheme"
-    | "Size1";
+    | "Size1"
+    | "No-Response"
+    | "OCF-Accept-Content-Format-Version"
+    | "OCF-Content-Format-Version";
 
 export type CoapMethod = "GET" | "POST" | "PUT" | "DELETE" | "FETCH" | "PATCH" | "iPATCH";
 

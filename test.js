@@ -238,7 +238,7 @@ describe('packet.parse', function () {
       // this is not specified by the protocol,
       // but it's needed to check if it can parse
       // numbers
-      9: 9
+      10: 10
     }
 
     Object.keys(options).forEach(function (option) {
@@ -305,7 +305,7 @@ describe('packet.parse', function () {
       // this is not specified by the protocol,
       // but it's needed to check if it can parse
       // numbers
-      16: '16'
+      13: '13'
     }
 
     Object.keys(options).forEach(function (num) {
@@ -560,7 +560,7 @@ describe('packet.parse', function () {
       // this is not specified by the protocol,
       // but it's needed to check if it can parse
       // numbers
-      9: 9
+      10: 10
     }
 
     Object.keys(options).forEach(function (option) {
@@ -857,16 +857,17 @@ describe('packet.generate', function () {
     })
 
     const longOptions = {
+      13: 13, // unknown, just to be sure it parses
       'Max-Age': 14,
       'Uri-Query': 15,
-      16: 16, // unknown, just to be sure it parses
       Accept: 17,
       'Location-Query': 20,
       Block2: 23,
       Block1: 27,
       'Proxy-Uri': 35,
       'Proxy-Scheme': 39,
-      Size1: 60
+      Size1: 60,
+      'No-Response': 258
     }
 
     Object.keys(longOptions).forEach(function (option) {
@@ -921,8 +922,15 @@ describe('packet.generate', function () {
       })
     })
 
-    ;['560', '720'].forEach(function (option) {
-      const optionNum = '' + option
+    const evenLongerOptions = {
+      560: 560,
+      720: 720,
+      'OCF-Accept-Content-Format-Version': 2049,
+      'OCF-Content-Format-Version': 2053
+    }
+
+    Object.keys(evenLongerOptions).forEach(function (option) {
+      const optionNum = evenLongerOptions[option]
 
       it('should generate ' + option + ' option with unextended length', function () {
         packet = {
