@@ -12,7 +12,7 @@ What is CoAP?
 intended to be used in very simple electronics devices that allows them
 to communicate interactively over the Internet. -  Wikipedia
 
-This library follows [RFC 7252](https://datatracker.ietf.org/doc/html/rfc7252) for generating and parsing of CoAP packets.
+This library follows [RFC 7252](https://datatracker.ietf.org/doc/html/rfc7252) and [RFC 8974](https://datatracker.ietf.org/doc/html/rfc8974) for generating and parsing of CoAP packets.
 It also supports the method and option codes specified by other specifications, such as [RFC 7641](https://datatracker.ietf.org/doc/html/rfc7641), [RFC 7959](https://datatracker.ietf.org/doc/html/rfc7959), and [RFC 8132](https://datatracker.ietf.org/doc/html/rfc8132).
 
 It does not provide any CoAP semantics, it just parses the protocol.
