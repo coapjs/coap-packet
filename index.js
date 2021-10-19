@@ -28,7 +28,7 @@ const codes = {
   ipatch: 7
 }
 
-module.exports.generate = function generate (packet) {
+module.exports.generate = function generate (packet, maxLength = 1280) {
   let pos = 0
 
   packet = fillGenDefaults(packet)
@@ -45,8 +45,8 @@ module.exports.generate = function generate (packet) {
     tokenMask = 14
   }
 
-  if (length > 1280) {
-    throw new Error('Max packet size is 1280: current is ' + length)
+  if (length > maxLength) {
+    throw new Error(`Max packet size is ${maxLength}: current is ${length}`)
   }
 
   const buffer = Buffer.alloc(length)
