@@ -28,15 +28,25 @@ const codes = {
   ipatch: 7
 }
 
-module.exports.generate = function generate (packet) {
+module.exports.generate = function generate (packet, maxLength = 1280) {
   let pos = 0
 
   packet = fillGenDefaults(packet)
   const options = prepareOptions(packet)
   const length = calculateLength(packet, options)
+  const tokenLength = packet.token.length
+  let tokenMask
 
-  if (length > 1280) {
-    throw new Error('Max packet size is 1280: current is ' + length)
+  if (tokenLength < 13) {
+    tokenMask = tokenLength
+  } else if (tokenLength < 270) {
+    tokenMask = 13
+  } else if (tokenLength < 65805) {
+    tokenMask = 14
+  }
+
+  if (length > maxLength) {
+    throw new Error(`Max packet size is ${maxLength}: current is ${length}`)
   }
 
   const buffer = Buffer.alloc(length)
@@ -45,7 +55,7 @@ module.exports.generate = function generate (packet) {
   let byte = 0
   byte |= 1 << 6 // first two bits are version
   byte |= confirmableAckResetMask(packet)
-  byte |= packet.token.length
+  byte |= tokenMask
   buffer.writeUInt8(byte, pos++)
 
   // code can be humized or not
@@ -59,9 +69,17 @@ module.exports.generate = function generate (packet) {
   buffer.writeUInt16BE(packet.messageId, pos)
   pos += 2
 
+  if (tokenLength > 268) {
+    buffer.writeUInt16BE(tokenLength - 269, pos)
+    pos += 2
+  } else if (tokenLength > 12) {
+    buffer.writeUInt8(tokenLength - 13, pos)
+    pos++
+  }
+
   // the token might be an empty buffer
   packet.token.copy(buffer, pos)
-  pos += packet.token.length
+  pos += tokenLength
 
   // write the options
   for (let i = 0; i < options.length; i++) {
@@ -148,9 +166,15 @@ function parseCode (buffer) {
 }
 
 function parseToken (buffer) {
-  const length = buffer.readUInt8(0) & 15
+  let length = buffer.readUInt8(0) & 15
 
-  if (length > 8) {
+  if (length === 13) {
+    length = buffer.readUInt8(index) + 13
+    index += 1
+  } else if (length === 14) {
+    length = buffer.readUInt16BE(index) + 269
+    index += 2
+  } else if (length === 15) {
     throw new Error('Token length not allowed')
   }
 
@@ -286,7 +310,7 @@ function fillGenDefaults (packet) {
     packet.token = empty
   }
 
-  if (packet.token.length > 8) {
+  if (packet.token.length > 65804) {
     throw new Error('Token too long')
   }
 
@@ -339,6 +363,14 @@ function confirmableAckResetMask (packet) {
 
 function calculateLength (packet, options) {
   let length = 4 + packet.payload.length + packet.token.length
+
+  if (packet.token.length > 12) {
+    length += 1
+  }
+
+  if (packet.token.length > 268) {
+    length += 1
+  }
 
   if (packet.code !== '0.00' && packet.payload.toString() !== '') {
     length += 1

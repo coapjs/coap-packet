@@ -63,5 +63,5 @@ export interface Option {
     value: Buffer;
 }
 
-export function generate(packet: Packet): Buffer;
+export function generate(packet: Packet, maxLength?: number): Buffer;
 export function parse(buffer: Buffer): ParsedPacket;

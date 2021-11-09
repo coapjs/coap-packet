@@ -182,6 +182,67 @@ describe('packet.parse', function () {
       packet = parse(buffer)
       expect(packet.token).to.eql(Buffer.alloc(0))
     })
+
+    it('should not allow for a token length value of 15', function () {
+      byte = 0
+      byte |= 1 << 6 // byte two bits are version
+      byte |= 15 // the TKL length is invalid
+
+      buffer.writeUInt8(byte, 0)
+      expect(parse.bind(null, buffer)).to.throw('Token length not allowed')
+    })
+
+    it('should parse a token with extended length of 13 bytes', function () {
+      buffer = Buffer.alloc(20)
+
+      byte = 0
+      byte |= 1 << 6 // byte two bits are version
+      byte |= 1 << 4 // the message is non-confirmable
+      byte |= 13 // the TKL length is specified in the byte before the token
+      buffer.writeUInt8(byte, 0)
+
+      buffer.writeUInt8(1, 1) // it is a post
+
+      buffer.writeUInt16BE(42, 2) // the message ID
+      buffer.writeUInt8(0, 4) // it has a token length of 13 bytes
+      const token = Buffer.alloc(13)
+      token.copy(buffer, 5, 0, 13)
+
+      buffer.writeUInt8(255, 18) // the payload seperator
+      buffer.writeUInt8(42, 19) // the payload
+
+      packet = parse(buffer)
+
+      expect(packet.code).to.eql('0.01')
+      expect(packet.token).to.eql(token)
+      expect(packet.payload).to.eql(Buffer.of(42))
+    })
+
+    it('should parse a token with extended length of 269 bytes', function () {
+      buffer = Buffer.alloc(280)
+
+      byte = 0
+      byte |= 1 << 6 // byte two bits are version
+      byte |= 1 << 4 // the message is non-confirmable
+      byte |= 14 // the TKL length is specified in the two bytes before the token
+      buffer.writeUInt8(byte, 0)
+
+      buffer.writeUInt8(1, 1) // it is a post
+
+      buffer.writeUInt16BE(42, 2) // the message ID
+      buffer.writeInt16BE(0, 3) // it has a token length of 269 bytes
+      const token = Buffer.alloc(269)
+      token.copy(buffer, 6, 0)
+
+      buffer.writeUInt8(255, 278) // the payload seperator
+      buffer.writeUInt8(42, 279) // the payload
+
+      packet = parse(buffer)
+
+      expect(packet.code).to.eql('0.01')
+      expect(packet.token).to.eql(token)
+      expect(packet.payload).to.eql(Buffer.of(42))
+    })
   })
 
   describe('with a payload and a single option with unextended number and length', function () {
@@ -737,8 +798,8 @@ describe('packet.generate', function () {
       expect(byte).to.equal(3)
     })
 
-    it('should have a maximum token length of 8', function () {
-      token = Buffer.alloc(9)
+    it('should have a maximum token length of 65804', function () {
+      token = Buffer.alloc(65805)
       expect(generate.bind(null, { token: token })).to.throw('Token too long')
     })
 
@@ -1045,6 +1106,21 @@ describe('parse and generate', function () {
 
   it('should send an empty message', function () {
     expect(parse(generate({ code: '0.00', ack: true }))).to.have.property('ack', true)
+  })
+
+  it('should generate and parse a packet with token length 13', function () {
+    const token = Buffer.alloc(13)
+    expect(parse(generate({ token })).token).to.eql(token)
+  })
+
+  it('should generate and parse a packet with token length 1000', function () {
+    const token = Buffer.alloc(1000)
+    expect(parse(generate({ token })).token).to.eql(token)
+  })
+
+  it('should generate and parse a packet with token length 65804', function () {
+    const token = Buffer.alloc(65804)
+    expect(parse(generate({ token }, 65810)).token).to.eql(token)
   })
 
   it('should process a packet with Uri-Path and Observe', function () {
