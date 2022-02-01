@@ -185,49 +185,52 @@ function parseToken (buffer) {
   return result
 }
 
-const numMap = {
-  1: 'If-Match',
-  3: 'Uri-Host',
-  4: 'ETag',
-  5: 'If-None-Match',
-  6: 'Observe',
-  7: 'Uri-Port',
-  8: 'Location-Path',
-  9: 'OSCORE',
-  11: 'Uri-Path',
-  12: 'Content-Format',
-  14: 'Max-Age',
-  15: 'Uri-Query',
-  16: 'Hop-Limit',
-  17: 'Accept',
-  19: 'Q-Block1',
-  20: 'Location-Query',
-  23: 'Block2',
-  27: 'Block1',
-  28: 'Size2',
-  31: 'Q-Block2',
-  35: 'Proxy-Uri',
-  39: 'Proxy-Scheme',
-  60: 'Size1',
-  258: 'No-Response',
-  2049: 'OCF-Accept-Content-Format-Version',
-  2053: 'OCF-Content-Format-Version'
+const OPTIONS_BY_NAME = {
+  "If-Match": 1,
+  "Uri-Host": 3,
+  "ETag": 4,
+  "If-None-Match": 5,
+  "Observe": 6,
+  "Uri-Port": 7,
+  "Location-Path": 8,
+  "OSCORE": 9,
+  "Uri-Path": 11,
+  "Content-Format": 12,
+  "Max-Age": 14,
+  "Uri-Query": 15,
+  "Hop-Limit": 16,
+  "Accept": 17,
+  "Q-Block1": 19,
+  "Location-Query": 20,
+  "Block2": 23,
+  "Block1": 27,
+  "Size2": 28,
+  "Q-Block2": 31,
+  "Proxy-Uri": 35,
+  "Proxy-Scheme": 39,
+  "Size1": 60,
+  "No-Response": 258,
+  "OCF-Accept-Content-Format-Version": 2049,
+  "OCF-Content-Format-Version": 2053
 }
 
-const optionNumberToString = (function genOptionParser () {
-  let code = Object.keys(numMap).reduce(function (acc, key) {
-    acc += 'case ' + key + ':\n'
-    acc += '  return \'' + numMap[key] + '\'\n'
+const OPTIONS_BY_NUMBER = new Array(2054)
+for (const key in OPTIONS_BY_NAME) {
+  const number = OPTIONS_BY_NAME[key]
+  OPTIONS_BY_NUMBER[number] = key
+}
 
-    return acc
-  }, 'switch(number) {\n')
+function optionNumberToString (number) {
+  const string = OPTIONS_BY_NUMBER[number]
+  if (string) return string
+  return '' + number
+}
 
-  code += 'default:\n'
-  code += 'return \'\' + number'
-  code += '}\n'
-
-  return new Function('number', code) /* eslint-disable-line no-new-func */
-})()
+function optionStringToNumber (string) {
+  const number = OPTIONS_BY_NAME[string]
+  if (number) return number
+  return parseInt(string)
+}
 
 function parseOptions (buffer) {
   let number = 0
@@ -383,32 +386,12 @@ function calculateLength (packet, options) {
   return length
 }
 
-const optionStringToNumber = (function genOptionParser () {
-  let code = Object.keys(numMap).reduce(function (acc, key) {
-    acc += 'case \'' + numMap[key] + '\':\n'
-    acc += '  return \'' + key + '\'\n'
-
-    return acc
-  }, 'switch(string) {\n')
-
-  code += 'default:\n'
-  code += 'return parseInt(string)'
-  code += '}\n'
-
-  return new Function('string', code) /* eslint-disable-line no-new-func */
-})()
-
-const nameMap = Object.keys(numMap).reduce(function (acc, key) {
-  acc[numMap[key]] = key
-  return acc
-}, {})
-
 function optionSorter (a, b) {
   a = a.name
   b = b.name
 
-  a = parseInt(nameMap[a] || a)
-  b = parseInt(nameMap[b] || b)
+  a = parseInt(OPTIONS_BY_NAME[a] || a)
+  b = parseInt(OPTIONS_BY_NAME[b] || b)
 
   if (a < b) {
     return -1
